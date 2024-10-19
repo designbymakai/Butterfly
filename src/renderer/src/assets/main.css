@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body, html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+body::-webkit-scrollbar, html::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+      display: none;
+  }
+ /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+}
+}
+
+/* Remove the default focus outline and add a custom focus style */
+input:focus, button:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 0px; /* Example: black focus ring */
+}
+
+input, textarea, select{
+  border: 0;
+  margin: 0;
+  padding: 0;
+  color: #62696a;
+  background: transparent;
+  resize: none;
+  cursor: pointer;
+}
+
+.color-picker-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  outline: none;
+  z-index: 1001; /* Ensure it is above other elements */
+}
+
+.color-picker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 1000; /* Ensure it is above other elements */
+}
+
+.event-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  outline: none;
+  z-index: 1001; /* Ensure it is above other elements */
+}
+
+.event-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 1000; /* Ensure it is above other elements */
+}
+
+
+.tooltip-content {
+  background-color: #1f292b;
+  color: #FAF9F9;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-width: 200px;
+  font-size: 14px;
+}
+
+.tooltip-content i {
+  margin-bottom: 3px;
+  font-size: 12px;
+
+}
+.tooltip-content strong {
+  font-size: 16px;
+  color: #75B9BE;
+  margin-bottom: 5px;
+  display: block;
+  text-align: center;
+}

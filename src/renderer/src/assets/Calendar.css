@@ -1,0 +1,170 @@
+/* Existing styles */
+.calendar-container {
+  height: 100%; /* Full viewport height */
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.5rem;
+  padding: 1rem;
+}
+
+.rbc-event {
+  background-color: #1e3a8a; /* Background color for events */
+  color: white; /* Text color for events */
+  padding: 5px; /* Padding inside events */
+  border-radius: 4px; /* Rounded corners for events */
+  font-size: 14px; /* Font size for event text */
+  overflow: hidden; /* Ensure text does not overflow */
+  white-space: nowrap; /* Prevent text from wrapping */
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
+}
+
+.rbc-event-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* Adjust the height of the events */
+.rbc-day-slot .rbc-event {
+  min-height: 30px; /* Minimum height for events */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75); /* Semi-transparent background */
+  z-index: 1000; /* Ensure it is above other elements */
+}
+
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 25%;
+  background-color: #065975; /* Solid background color */
+  color: white;
+  padding: 20px;
+  border-radius: 2em;
+  z-index: 1001; /* Ensure it is above the overlay */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.mini-calendar-event {
+  height: 20px !important; /* Adjust the height as needed */
+  font-size: 10px !important; /* Adjust the font size as needed */
+  line-height: 20px !important; /* Ensure text is vertically centered */
+  overflow: hidden; /* Hide overflow text */
+  white-space: nowrap; /* Prevent text wrapping */
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
+}
+
+.rbc-calendar {
+  border: none !important;
+}
+
+.rbc-month-view, 
+.rbc-time-view, 
+.rbc-agenda-view {
+  border: none;
+}
+
+.rbc-day-bg, 
+.rbc-time-slot, 
+.rbc-time-header-cell, 
+.rbc-time-content > * + * > * {
+  border: none;
+}
+
+.rbc-header, 
+.rbc-header + .rbc-header, 
+.rbc-header + .rbc-header + .rbc-header {
+  border: none !important;
+}
+
+.rbc-today {
+  border: none;
+}
+
+.rbc-day-bg + .rbc-day-bg {
+  border: none;
+}
+
+.rbc-month-view, 
+.rbc-agenda-view, 
+.rbc-time-view, 
+.rbc-day-view, 
+.rbc-week-view, 
+.rbc-work-week-view, 
+.rbc-month-view, 
+.rbc-day-view, 
+.rbc-week-view, 
+.rbc-work-week-view, 
+.rbc-time-view, 
+.rbc-agenda-view, 
+.rbc-month-view {
+  border: none !important;
+}
+
+.rbc-month-view + .rbc-month-view + .rbc-month-view + .rbc-month-view + rbc-month-view {
+  border: none !important;
+}
+
+.rbc-month-row {
+  border: none !important;
+}
+
+.rbc-month-row > div {
+  border: none !important;
+}
+
+.rbc-row-content {
+  border-top: none !important;
+}
+
+.rbc-row-content > div {
+  border: none !important;
+}
+
+.rbc-row-segment {
+  border: none !important;
+}
+
+.rbc-date-cell {
+  border: none !important;
+  text-align: left !important; /* Left-align the day numbers */
+  padding-left: 5px; /* Optional: Add some padding to the left */
+}
+
+.rbc-off-range-bg {
+  border: none !important;
+  background-color: transparent !important; /* Make the background transparent */
+}
+
+.rbc-off-range {
+  background-color: transparent !important; /* Ensure the background is transparent */
+  color: #b0b0b0; /* Optional: Change the text color for off-range dates */
+}
+
+.rbc-off-range .rbc-date-cell {
+  background-color: #f0f0f0; /* Background color for the numbers */
+  border-radius: 50%; /* Optional: Make the background circular */
+  padding: 2px 5px; /* Optional: Add some padding */
+}
+
+/* Center-align the weekday column headers */
+.rbc-header {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 0 !important; /* Remove any padding */
+  line-height: 1.5 !important; /* Adjust line height if necessary */
+}
+
