@@ -1,4 +1,3 @@
-Here’s the README in Markdown format:
 
 # Butterfly: ADHD Productivity App
 
@@ -14,7 +13,18 @@ Butterfly is a productivity app designed to help adults with ADHD manage tasks, 
 
 - [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
-## Project Setup
+# Downloads
+
+Check [releases](https://github.com/designbymakai/Butterfly/releases/tag/prototype) for windows installer (164MB), Mac DMG installer is also linked there or you can find it below.
+
+[**Mac Version**](https://www.icloud.com/iclouddrive/010-OUOh7Gs6WriWeEzXdVsAg#butterfly-1.0.0) 
+Size: 6GB (was unable to shrink size)
+
+
+
+
+
+## Project setup to view code
 
 ### Install
 ```bash
