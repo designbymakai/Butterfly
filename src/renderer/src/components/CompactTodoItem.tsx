@@ -4,68 +4,70 @@ import { faCalendarAlt, faProjectDiagram, faStickyNote } from '@fortawesome/free
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 
-const CompactTodoItem = ({ todo, onToggle, onUpdate, onSave, selectedIcon }) => {
+interface CompactTodoItemProps {
+  title: string;
+  description: string;
+  project: string;
+  dueDate: string;
+  tags?: string[]; // Make tags optional
+  completed: boolean;
+  onToggle: () => void;
+  onSave: () => void;
+  selectedIcon: any;
+  projectColor: string;
+}
+
+const CompactTodoItem: React.FC<CompactTodoItemProps> = ({
+  title,
+  description,
+  project,
+  dueDate,
+  tags = [], // Default value for tags
+  completed,
+  onToggle,
+  onSave,
+  selectedIcon,
+  projectColor,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const handleIconClick = (type) => {
-    // Handle icon click based on type (date, project, description)
-    console.log(`Icon clicked: ${type}`);
+  const handleIconClick = (type: string) => {
+    // Handle icon click logic here
   };
-
-  // Ensure todo object has default values for missing properties
-  const { completed = false, title = 'New Task', dueDate, project = 'No project', description = 'No description', tags = [] } = todo || {};
 
   return (
     <div
-      className='flex items-center mb-2 p-2 rounded-lg hover:bg-b-white-300 hover:text-b-black-400 shadow-b-white-200'
+      className="flex items-center p-2 my-2 rounded shadow"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      style={{ borderLeft: `4px solid ${projectColor}`, backgroundColor: projectColor }} // Add project color border and background
     >
       {selectedIcon ? (
-        <FontAwesomeIcon icon={selectedIcon} className='mx-2 h-4 w-4' />
+        <FontAwesomeIcon icon={selectedIcon} className="mr-2" />
       ) : (
         <input
-          type='checkbox'
+          type="checkbox"
           checked={completed}
           onChange={onToggle}
-          className='mx-2 h-4 w-4'
+          className="mr-2"
         />
       )}
-      <span className={`text-lg ${completed ? 'line-through' : ''} flex-grow`}>
-        {title}
-      </span>
-      <div className='flex items-center ml-1'>
-        <Tippy content={dueDate ? new Date(dueDate).toLocaleString() : 'No due date'}>
-          <FontAwesomeIcon
-            icon={faCalendarAlt}
-            className='text-gray-500 mx-1 cursor-pointer'
-            onClick={() => handleIconClick('date')}
-          />
+      <div className="flex-grow">
+        <div className='flex flex-row justify-between'>
+          <div className="font-bold">{title}</div>
+          <div className="text-sm text-gray-500 text-right pr-4">#{tags.join(', #')}</div>
+        </div>
+      </div>
+      <div className="flex space-x-2">
+        <Tippy content={dueDate}>
+          <FontAwesomeIcon icon={faCalendarAlt} onClick={() => handleIconClick('date')} />
         </Tippy>
         <Tippy content={project}>
-          <FontAwesomeIcon
-            icon={faProjectDiagram}
-            className='text-gray-500 mx-1 cursor-pointer'
-            onClick={() => handleIconClick('project')}
-          />
+          <FontAwesomeIcon icon={faProjectDiagram} onClick={() => handleIconClick('project')} />
         </Tippy>
         <Tippy content={description}>
-          <FontAwesomeIcon
-            icon={faStickyNote}
-            className='text-gray-500 mx-1 cursor-pointer'
-            onClick={() => handleIconClick('description')}
-          />
+          <FontAwesomeIcon icon={faStickyNote} onClick={() => handleIconClick('description')} />
         </Tippy>
-      </div>
-      <div className='flex items-center ml-2'>
-        {tags.map((tag, index) => (
-          <span
-            key={index}
-            className='text-sm text-b-black-500 mr-2 bg-b-white-400 rounded-xl px-1.5'
-          >
-            #{tag}
-          </span>
-        ))}
       </div>
     </div>
   );

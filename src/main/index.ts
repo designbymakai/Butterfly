@@ -1,9 +1,6 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
-import icon from '../../resources/icon.png?asset';
-import { createRequire } from 'node:module';
-import path from 'node:path';
+import { is } from '@electron-toolkit/utils';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
 
@@ -12,13 +9,11 @@ if (!process.env.OPENAI_API_KEY) {
   dotenv.config({ path: join(app.getAppPath(), '.env') });
 }
 
-const require = createRequire(import.meta.url);
-
 const apiKey = process.env.OPENAI_API_KEY;
 if (!apiKey) {
   throw new Error('The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: \'My API Key\' }).');
 }
-const openai = new OpenAI(apiKey);
+const openai = new OpenAI({ apiKey });
 
 function createWindow(): void {
   const iconPath = process.platform === 'darwin'
@@ -63,7 +58,7 @@ function createWindow(): void {
   }
 }
 
-ipcMain.handle('fetch-openai-response', async (event, input) => {
+ipcMain.handle('fetch-openai-response', async (_, input: string) => {
   if (!apiKey) {
     throw new Error('The OPENAI_API_KEY environment variable is missing or empty.');
   }
@@ -78,25 +73,29 @@ ipcMain.handle('fetch-openai-response', async (event, input) => {
         { role: 'user', content: "What tasks do I have due today?" },
         { role: "system", content: 'You have one task due today! {"UUID" : "0c389dd1f-9341-4c49-a186-495b4b287b72"}' },
         { role: 'user', content: "What tasks do I have due this week?" },
-        { role: 'system', content: 'You have a few tasks due this week: Task 1: {"UUID": "4a84d6d8-6cc0-4d1e-aedf-5405655a0f3a"}, Task 2: {"UUID": "293d7549-e611-468b-9df5-61d7afff54ca"}  If you need more details on any task, just let me know! Remember to take one step at a time, and you’re doing great!' },
+        { role: "system", content: 'You have a few tasks due this week: Task 1: {"UUID": "4a84d6d8-6cc0-4d1e-aedf-5405655a0f3a"}, Task 2: {"UUID": "293d7549-e611-468b-9df5-61d7afff54ca"}  If you need more details on any task, just let me know! Remember to take one step at a time, and you’re doing great!' },
         { role: 'user', content: "Create task: create mockup logo for startup" },
-        { role: 'system', content: 'A task has been created: {"id": "placeholder-id", "title": "Create Mockup Logo for Startup", "description": "Design a mockup logo for the startup project. Make sure to explore different variations and concepts.", "dueDate": "2024-09-16T12:00:00.000Z", "tags": ["design", "branding", "logo"], "completed": false' },
+        { role: "system", content: 'A task has been created: {"id": "placeholder-id", "title": "Create Mockup Logo for Startup", "description": "Design a mockup logo for the startup project. Make sure to explore different variations and concepts.", "dueDate": "2024-09-16T12:00:00.000Z", "tags": ["design", "branding", "logo"], "completed": false' },
         { role: 'user', content: input },
       ],
       temperature: 0.7,
     });
 
     if (response.choices && response.choices.length > 0) {
-      return response.choices[0].message.content.trim();
+      return response.choices[0].message?.content?.trim() ?? '';
     } else {
       throw new Error('No response from OpenAI Assistant');
     }
   } catch (error) {
-    throw new Error(`Error fetching response from OpenAI Assistant: ${error.message}`);
+    if (error instanceof Error) {
+      throw new Error(`Error fetching response from OpenAI Assistant: ${error.message}`);
+    } else {
+      throw new Error('Unknown error occurred');
+    }
   }
 });
 
-ipcMain.handle('create-task', async (event, taskDetails) => {
+ipcMain.handle('create-task', async (_) => {
   // Implement logic to create a task
   // You can use the `taskDetails` to create a task in the Todo component
 });

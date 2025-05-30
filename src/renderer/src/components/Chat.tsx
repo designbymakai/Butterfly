@@ -1,26 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { loadTodosFromLocalStorage, saveTodosToLocalStorage } from '@renderer/pages/Todo'; // Import saveTodosToLocalStorage
+import { loadTodosFromLocalStorage, saveTodosToLocalStorage } from '../utils/localStorageUtils'; // Update import path
 import { loadEventsFromLocalStorage } from '@renderer/pages/Calendar';
 import ReactMarkdown from 'react-markdown';
-import CompactTodoItem from './CompactTodoItem'; // Import CompactTodoItem
-import { v4 as uuidv4 } from 'uuid'; // Import uuid
+import CompactTodoItem from './CompactTodoItem';
+import { v4 as uuidv4 } from 'uuid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBroom } from '@fortawesome/free-solid-svg-icons';
 
 interface Message {
   sender: 'user' | 'bot';
-  content: string | (string | JSX.Element)[]; // Updated to handle mixed content
-  tasks?: Task[]; // Optional tasks property
+  content: string | (string | JSX.Element)[];
+  tasks?: Task[];
 }
 
 interface Task {
-  id: string; // Include UUID
+  id: string;
   title: string;
   description: string;
   dueDate: string;
   completed: boolean;
   project: string;
   tags: string[];
+  icon: any;
 }
 
 interface Event {
@@ -33,7 +34,7 @@ interface Event {
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const createTaskRef = useRef<(taskDetails: Task) => void | null>(null); // Create a ref for the createTask function
+  const createTaskRef = useRef<(taskDetails: Task) => void>();
 
   const fetchTasksAndEvents = () => {
     const tasks: Task[] = loadTodosFromLocalStorage();
@@ -82,40 +83,40 @@ When the user asks you to Create a Task, respond in the following format: {
     const { tasks, events } = fetchTasksAndEvents();
     const formattedData = formatTasksAndEvents(tasks, events);
     const finalPrompt = `${brandStylePrompt}\n${formattedData}\nUser: ${content}\nAI:`;
-    console.log('Final Prompt:', finalPrompt); // Log the final prompt
+    console.log('Final Prompt:', finalPrompt);
 
     try {
-      const response = await window.api.fetchOpenAIResponse(finalPrompt);
+      const response = await (window.api as any).fetchOpenAIResponse(finalPrompt);
 
-      console.log('ChatGPT Response:', response); // Log the entire response
+      console.log('ChatGPT Response:', response);
 
       let botMessage: Message = { sender: 'bot', content: [] };
 
-      // Improved regex pattern to match JSON strings more accurately
       const jsonMatch = response.match(/{[^}]+}/g);
       if (jsonMatch) {
-        console.log('Matched JSON objects:', jsonMatch); // Log the matched JSON objects
+        console.log('Matched JSON objects:', jsonMatch);
         const taskDetailsArray = parseTaskDetails(jsonMatch.join(''));
-        console.log('Parsed Task Details:', taskDetailsArray); // Log the parsed task details
+        console.log('Parsed Task Details:', taskDetailsArray);
 
         if (createTaskRef.current) {
           const existingTasks = loadTodosFromLocalStorage();
-          const newTasks = [];
-          const existingTaskDetails = [];
+          const newTasks: Task[] = [];
+          const existingTaskDetails: Task[] = [];
 
           taskDetailsArray.forEach(taskDetails => {
             const existingTask = existingTasks.find(task => task.id === taskDetails.id);
             if (existingTask) {
               existingTaskDetails.push(existingTask);
             } else {
-              createTaskRef.current(taskDetails); // Use the ref to call createTask
+              if (createTaskRef.current) {
+                createTaskRef.current(taskDetails);
+              }
               newTasks.push(taskDetails);
-              console.log('Task created:', taskDetails); // Log the task creation
+              console.log('Task created:', taskDetails);
             }
           });
 
-          // Replace JSON data in the response with CompactTodoItems
-          const updatedContent = response.split('\n').map((line, index) => {
+          const updatedContent = response.split('\n').map((line) => {
             const match = line.match(/{[^}]+}/);
             if (match) {
               const jsonObject = JSON.parse(match[0]);
@@ -123,7 +124,7 @@ When the user asks you to Create a Task, respond in the following format: {
                 const task = existingTasks.find(task => task.id === jsonObject.UUID);
                 if (task) {
                   return (
-                    <CompactTodoItem key={task.id} todo={task} onToggle={() => {}} onUpdate={() => {}} onSave={() => {}} />
+                    <CompactTodoItem key={task.id} title={task.title} description={task.description} dueDate={task.dueDate} completed={task.completed} project={task.project} tags={task.tags} onToggle={() => { } } onUpdate={() => { } } onSave={() => { } } selectedIcon={task.icon} projectColor={''} />
                   );
                 }
               } else {
@@ -131,12 +132,12 @@ When the user asks you to Create a Task, respond in the following format: {
                 const task = existingTasks.find(task => task.id === taskDetails.id) || newTasks.find(task => task.id === taskDetails.id);
                 if (task) {
                   return (
-                    <CompactTodoItem key={task.id} todo={task} onToggle={() => {}} onUpdate={() => {}} onSave={() => {}} />
+                    <CompactTodoItem key={task.id} title={task.title} description={task.description} dueDate={task.dueDate} completed={task.completed} project={task.project} tags={task.tags} onToggle={() => { } } onUpdate={() => { } } onSave={() => { } } selectedIcon={task.icon} projectColor={''} />
                   );
                 }
               }
             }
-            return line.replace(/{[^}]+}/g, ''); // Hide JSON data
+            return line.replace(/{[^}]+}/g, '');
           });
 
           botMessage = {
@@ -150,7 +151,7 @@ When the user asks you to Create a Task, respond in the following format: {
         console.log('No JSON match found in response');
         botMessage = {
           sender: 'bot',
-          content: [response.replace(/{[^}]+}/g, '')] // Hide JSON data
+          content: [response.replace(/{[^}]+}/g, '')]
         };
       }
 
@@ -164,20 +165,18 @@ When the user asks you to Create a Task, respond in the following format: {
 
   const parseTaskDetails = (jsonString: string) => {
     try {
-      console.log('Parsing JSON string:', jsonString); // Log the JSON string being parsed
+      console.log('Parsing JSON string:', jsonString);
 
-      // Match individual JSON objects in the string
       const jsonObjects = jsonString.match(/{[^}]+}/g);
       if (!jsonObjects) {
         throw new Error('No valid JSON objects found');
       }
 
-      // Parse each JSON object and ensure it contains the required fields
       return jsonObjects.map(jsonObject => {
-        console.log('Parsing JSON object:', jsonObject); // Log each JSON object being parsed
+        console.log('Parsing JSON object:', jsonObject);
         const taskDetails = JSON.parse(jsonObject);
         if (taskDetails.id === 'placeholder-id') {
-          taskDetails.id = uuidv4(); // Assign a new UUID if the task has a placeholder-id
+          taskDetails.id = uuidv4();
         }
         if (!taskDetails.dueDate || !taskDetails.title) {
           console.warn('Skipping invalid task details:', taskDetails);
@@ -185,10 +184,10 @@ When the user asks you to Create a Task, respond in the following format: {
         }
         return {
           ...taskDetails,
-          dueDate: taskDetails.dueDate && !isNaN(new Date(taskDetails.dueDate).getTime()) ? taskDetails.dueDate : new Date().toISOString(), // Ensure dueDate is not null
-          project: taskDetails.project || 'No Project', // Set default project to "No Project"
+          dueDate: taskDetails.dueDate && !isNaN(new Date(taskDetails.dueDate).getTime()) ? taskDetails.dueDate : new Date().toISOString(),
+          project: taskDetails.project || 'No Project',
         };
-      }).filter(task => task !== null); // Filter out invalid tasks
+      }).filter(task => task !== null);
     } catch (error) {
       console.error('Error parsing JSON string:', error);
       return [];
@@ -199,14 +198,13 @@ When the user asks you to Create a Task, respond in the following format: {
     const tasks = loadTodosFromLocalStorage();
     const updatedTaskDetails = {
       ...taskDetails,
-      id: taskDetails.id === 'placeholder-id' ? uuidv4() : taskDetails.id, // Replace placeholder-id with a new UUID
+      id: taskDetails.id === 'placeholder-id' ? uuidv4() : taskDetails.id,
     };
     const updatedTasks = [...tasks, updatedTaskDetails];
     saveTodosToLocalStorage(updatedTasks);
-    console.log('Task saved to local storage:', updatedTaskDetails); // Log the task saving
+    console.log('Task saved to local storage:', updatedTaskDetails);
   };
 
-  // Assign the createTask function to the ref
   useEffect(() => {
     createTaskRef.current = createTask;
   }, []);

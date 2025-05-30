@@ -82,6 +82,7 @@
 .rbc-time-header-cell, 
 .rbc-time-content > * + * > * {
   border: none;
+  border-radius: 3px;
 }
 
 .rbc-header, 
@@ -92,10 +93,14 @@
 
 .rbc-today {
   border: none;
+  background-color: #d9d9d9;
 }
 
 .rbc-day-bg + .rbc-day-bg {
   border: none;
+}
+.rbc-day-bg + .rbc-day-bg:hover {
+  background-color: #f2f1f1;
 }
 
 .rbc-month-view, 
@@ -168,3 +173,55 @@
   line-height: 1.5 !important; /* Adjust line height if necessary */
 }
 
+.rbc-btn-group button + button, .rbc-toolbar button{
+  background-color: #75B9BE;
+  color: #FAF9F9;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 2em;
+  cursor: pointer;
+}
+.rbc-toolbar button:active, .rbc-toolbar button.rbc-active{
+  background-color: #55898c;
+  color: #FAF9F9;
+
+}
+.rbc-btn-group button + button:hover, .rbc-toolbar button:hover, .rbc-toolbar button:hover, .rbc-toolbar button.rbc-active:hover{
+  background-color: #92c7cb;
+  color: #FAF9F9;
+}
+.rbc-toolbar button:active:hover, .rbc-toolbar button:active:focus, .rbc-toolbar button.rbc-active:hover, .rbc-toolbar button.rbc-active:focus{
+  background-color: #92c7cb;
+  color: #FAF9F9;
+}
+
+.rbc-button-link{
+  color: #55898c;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.rbc-date-cell.rbc-now .rbc-button-link{
+  color: #FC7753;
+}
+.rbc-toolbar .rbc-toolbar-label{
+  color: #343d3f;
+  font-weight: bold;
+}
+
+.rbc-header, .rbc-header + .rbc-header, .rbc-header + .rbc-header + .rbc-header{
+  color: #343d3f;
+}
+
+/* New styles for tasks */
+.rbc-task {
+  background-color: #ffeb3b; /* Background color for tasks */
+  color: #000; /* Text color for tasks */
+  border: 2px dashed #000; /* Dashed border for tasks */
+  padding: 5px; /* Padding inside tasks */
+  border-radius: 4px; /* Rounded corners for tasks */
+  font-size: 14px; /* Font size for task text */
+  overflow: hidden; /* Ensure text does not overflow */
+  white-space: nowrap; /* Prevent text from wrapping */
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
+}

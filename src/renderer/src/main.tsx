@@ -10,6 +10,18 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   </React.StrictMode>
 );
 
+// Define types for window.api
+interface WindowApi {
+  fetchOpenAIResponse?: (message: string) => Promise<string>;
+  fetchWeather?: () => Promise<string>;
+}
+
+declare global {
+  interface Window {
+    api: WindowApi;
+  }
+}
+
 // Use contextBridge
 if (window.api && window.api.fetchOpenAIResponse) {
   window.api.fetchOpenAIResponse('Hello').then(response => {

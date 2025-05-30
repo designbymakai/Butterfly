@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import moment from 'moment';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
 import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css'; // optional for styling
-import '../assets/Calendar.css'; // Ensure this imports your custom CSS
+import 'tippy.js/dist/tippy.css';
+import moment from 'moment';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = momentLocalizer(moment);
 
@@ -28,14 +27,16 @@ const MiniCalendar = () => {
 
   const renderEvent = ({ event }) => (
     <Tippy
-      render={(attrs) => (
-        <div className="tooltip-content" {...attrs}>
+      content={
+        <div className="tooltip-content">
           <strong>{event.title}</strong>
           <i>{moment(event.start).format('ddd HH:mm A')} till {moment(event.end).format('ddd HH:mm A')}</i><br/>
           {event.description}
         </div>
-      )}
+      }
       allowHTML={true}
+      trigger="mouseenter focus"
+      hideOnClick={false}
     >
       <div className="tooltip">{event.title}</div>
     </Tippy>
@@ -52,8 +53,6 @@ const MiniCalendar = () => {
         views={['month']}
         defaultView="month"
         toolbar={false}
-        selectable={false}
-        popup={true}
         eventPropGetter={eventPropGetter}
         components={{
           event: renderEvent,

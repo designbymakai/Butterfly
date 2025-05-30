@@ -1,20 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CompactTodoItem from './CompactTodoItem'; // Import CompactTodoItem
 import EditProjectsModal from './EditProjectsModal';
 import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm'; // Import remark-gfm for GitHub Flavored Markdown
-import '@fortawesome/fontawesome-free/css/all.min.css'; // Ensure this line is included
-import '../assets/markdown.css'; // Import the custom CSS file
+import remarkGfm from 'remark-gfm';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import '../assets/markdown.css';
 
 // Configure MarkdownIt to support tables
 const mdParser = new MarkdownIt({ html: true, linkify: true, typographer: true });
 
-const ProjectsTab = ({ todos, setTodos, editMode, handleToggleTodo, handleUpdateTodo, projects, setProjects }) => {
+interface Project {
+  name: string;
+  color: string;
+}
+
+interface Todo {
+  id: string;
+  title: string;
+  description: string;
+  project: string;
+  tags: string[];
+  date: Date;
+  time: string;
+  completed: boolean;
+}
+
+interface ProjectsTabProps {
+  todos: Todo[];
+  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  editMode: boolean;
+  handleToggleTodo: (index: number) => void;
+  handleUpdateTodo: (updatedTodo: Todo, index: number) => void;
+  projects: Project[];
+  setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
+}
+
+const ProjectsTab: React.FC<ProjectsTabProps> = ({
+  todos,
+  handleToggleTodo,
+  handleUpdateTodo,
+  projects,
+  setProjects,
+}) => {
   const [selectedProject, setSelectedProject] = useState('');
-  const [projectNotes, setProjectNotes] = useState({});
+  const [projectNotes, setProjectNotes] = useState<Record<string, string>>({});
   const [isEditingProjects, setIsEditingProjects] = useState(false);
   const [isEditingNotes, setIsEditingNotes] = useState(false); // Display rendered text by default
 
@@ -31,12 +63,12 @@ const ProjectsTab = ({ todos, setTodos, editMode, handleToggleTodo, handleUpdate
     }
   }, [projectNotes, selectedProject]);
 
-  const handleProjectSelect = (project) => {
+  const handleProjectSelect = (project: Project) => {
     setSelectedProject(project.name);
     setIsEditingNotes(false); // Display rendered text by default
   };
 
-  const handleEditorChange = ({ text }) => {
+  const handleEditorChange = ({ text }: { text: string }) => {
     setProjectNotes({
       ...projectNotes,
       [selectedProject]: text,
@@ -53,73 +85,81 @@ const ProjectsTab = ({ todos, setTodos, editMode, handleToggleTodo, handleUpdate
 
   return (
     <div>
-    <div className='flex mb-4'>
-      <button
-        onClick={() => setIsEditingProjects(true)}
-        className='p-2 bg-yellow-500 text-white rounded ml-2'
-      >
-        <i className="fas fa-plus"></i>
-      </button>
-      {projects.map((project, index) => (
+      <div className='flex mb-4 items-center'>
         <button
-          key={index}
-          onClick={() => handleProjectSelect(project)}
-          className={`p-2 rounded ml-2 ${selectedProject === project.name ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}
-          style={{ backgroundColor: selectedProject === project.name ? project.color : 'gray' }}
+          onClick={() => setIsEditingProjects(true)}
+          className='p-1 px-2 bg-yellow-500 text-white rounded ml-2'
         >
-          {project.name}
+          <i className="fas fa-plus"></i>
         </button>
-      ))}
-      <button
-        onClick={() => setIsEditingNotes(true)}
-        className='p-2 bg-yellow-500 text-white rounded ml-2'
-      >
-        <i className="fas fa-pencil-alt"></i>
-      </button>
-    </div>
-    <EditProjectsModal
-      isOpen={isEditingProjects}
-      onRequestClose={() => setIsEditingProjects(false)}
-      projects={projects}
-      setProjects={setProjects}
-    />
-    {selectedProject && (
-      <div>
-        <div className='flex flex-col mt-4'>
-          {projectTodos.map((todo, index) => (
-            <CompactTodoItem
-              key={index}
-              todo={{ ...todo, project: selectedProject }} // Pass project name as string
-              onToggle={() => handleToggleTodo(index)}
-              onUpdate={(updatedTodo) => handleUpdateTodo(updatedTodo, index)}
-              onSave={() => {}} // Add onSave prop if needed
-              projectColor={selectedProjectColor} // Pass the project color
-            />
-          ))}
-        </div>
-        {isEditingNotes ? (
-          <div>
-            <MdEditor
-              value={projectNotes[selectedProject] || ''}
-              style={{ height: '300px', backgroundColor: 'transparent', border: 'none' }} // Set background to transparent and remove border
-              renderHTML={(text) => mdParser.render(text)}
-              onChange={handleEditorChange}
-              view={{ menu: true, md: true, html: false }} // Hide the preview tab
-            />
+        <button
+          onClick={() => setIsEditingNotes(true)}
+          className='p-1 px-2 bg-yellow-500 text-white rounded mx-2'
+        >
+          <i className="fas fa-pencil-alt"></i>
+        </button>
+
+        <div className='border-x-2 border-b-white-400 pr-2'>
+          {projects.map((project, index) => (
             <button
-              onClick={handleSave}
-              className='p-2 bg-blue-500 text-white rounded mt-2'
+              key={index}
+              onClick={() => handleProjectSelect(project)}
+              className={`p-1 px-2 rounded ml-2 ${selectedProject === project.name ? 'bg-blue-500 text-white' : 'bg-b-white-200 text-black'}`}
+              style={{ backgroundColor: selectedProject === project.name ? project.color : '#E5E7EB' }}
             >
-              Save
+              {project.name}
             </button>
-          </div>
-        ) : (
-          <div className="markdown-body"> {/* Add this class for Markdown styling */}
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{projectNotes[selectedProject] || ''}</ReactMarkdown>
-          </div>
-        )}
+        ))}
+        </div>
       </div>
-    )}
+      <EditProjectsModal
+        isOpen={isEditingProjects}
+        onRequestClose={() => setIsEditingProjects(false)}
+        projects={projects}
+        setProjects={setProjects}
+      />
+      {selectedProject && (
+        <div>
+          <div className='flex flex-col mt-4'>
+            {projectTodos.map((todo, index) => (
+              <CompactTodoItem
+              key={index}
+              title={todo.title}
+              description={todo.description}
+              project={todo.project}
+              dueDate={todo.date.toString()}
+              tags={todo.tags}
+              completed={todo.completed}
+              onToggle={() => handleToggleTodo(index)}
+              onSave={() => {}}
+              projectColor={selectedProjectColor} // Pass the project color
+              selectedIcon={undefined}
+            />
+            ))}
+          </div>
+          {isEditingNotes ? (
+            <div>
+              <MdEditor
+                value={projectNotes[selectedProject] || ''}
+                style={{ height: '300px', backgroundColor: 'transparent', border: 'none' }} // Set background to transparent and remove border
+                renderHTML={(text) => mdParser.render(text)}
+                onChange={handleEditorChange}
+                view={{ menu: true, md: true, html: false }} // Hide the preview tab
+              />
+              <button
+                onClick={handleSave}
+                className='p-2 bg-blue-500 text-white rounded mt-2'
+              >
+                Save
+              </button>
+            </div>
+          ) : (
+            <div className="markdown-body"> {/* Add this class for Markdown styling */}
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{projectNotes[selectedProject] || ''}</ReactMarkdown>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

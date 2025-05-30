@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faCalendarAlt, faClock, faTimes, faCircleExclamation, faQuestion, faTriangleExclamation, faPhone, faEnvelope, faStar, faCloud, faPaperclip, faNewspaper, faComputer, faBuilding, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faBell, faCalendarAlt, faClock, faTimes, faCircleExclamation, faQuestion, faTriangleExclamation, faPhone, faEnvelope, faStar, faCloud, faPaperclip, faNewspaper, faComputer, faBuilding, faPlus, faPencil } from '@fortawesome/free-solid-svg-icons';
 import { v4 as uuidv4 } from 'uuid';
 import DatePicker from 'react-datepicker'; // Import DatePicker
 import 'react-datepicker/dist/react-datepicker.css'; // Import DatePicker CSS
@@ -9,10 +9,29 @@ const icons = [
   faBell, faCircleExclamation, faQuestion, faTriangleExclamation, faPhone, faEnvelope, faStar, faCloud, faPaperclip, faNewspaper, faComputer, faBuilding
 ];
 
-const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onProjectClick, projectColor }) => {
-  const { id = uuidv4(), title = 'New Task', description = 'No description', project = 'No project', dueDate, tags = [], completed = false, icon = null } = todo || {};
+interface TodoItemProps {
+  todo: any;
+  onToggle: () => void;
+  onUpdate: (updatedTodo: any) => void;
+  onSave: (updatedTodo: any) => void;
+  isEditing: boolean;
+  projects: any;
+  onProjectClick: (projectName: string) => void;
+  projectColor: any;
+}
+
+const TodoItem: React.FC<TodoItemProps> = ({
+  todo,
+  onToggle,
+  onUpdate,
+  onSave,
+  projects,
+  projectColor,
+}) => {
+  const { id = uuidv4(), title = 'New Task', description = '', project = 'No project', dueDate, completed = false, icon = null } = todo || {};
 
   const [editTodo, setEditTodo] = useState({ ...todo, id });
+  const [isEditing, setIsEditing] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isEditingProject, setIsEditingProject] = useState(false);
@@ -21,20 +40,20 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
   const [isEditingTags, setIsEditingTags] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [isHovered, setIsHovered] = useState(false);
-  const [editingTagIndex, setEditingTagIndex] = useState(null);
+  const [editingTagIndex, setEditingTagIndex] = useState<number | null>(null);
   const [editingTagValue, setEditingTagValue] = useState('');
   const [showIconMenu, setShowIconMenu] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState(icon);
 
-  const titleRef = useRef(null);
-  const descriptionRef = useRef(null);
-  const projectRef = useRef(null);
-  const dueDateRef = useRef(null);
-  const dueTimeRef = useRef(null);
-  const tagsRef = useRef(null);
-  const iconMenuRef = useRef(null);
+  const titleRef = useRef<HTMLInputElement | null>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
+  const projectRef = useRef<HTMLSelectElement | null>(null);
+  const dueDateRef = useRef<DatePicker | null>(null);
+  const dueTimeRef = useRef<DatePicker | null>(null);
+  const tagsRef = useRef<HTMLInputElement | null>(null);
+  const iconMenuRef = useRef<HTMLDivElement | null>(null);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEditTodo({
       ...editTodo,
@@ -42,11 +61,11 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
     });
   };
 
-  const handleTagChange = (e) => {
+  const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTag(e.target.value);
   };
 
-  const handleTagKeyPress = (e) => {
+  const handleTagKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       if (newTag.trim() !== '') {
         const updatedTodo = {
@@ -61,7 +80,7 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
     }
   };
 
-  const handleDateChange = (date) => {
+  const handleDateChange = (date: Date | null) => {
     const updatedTodo = {
       ...editTodo,
       dueDate: date,
@@ -72,7 +91,7 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
     onSave(updatedTodo);
   };
 
-  const handleTimeChange = (time) => {
+  const handleTimeChange = (time: Date | null) => {
     const updatedTodo = {
       ...editTodo,
       dueDate: time,
@@ -86,6 +105,7 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
   const handleSave = () => {
     onUpdate(editTodo);
     onSave(editTodo);
+    setIsEditing(false);
     setIsEditingTitle(false);
     setIsEditingDescription(false);
     setIsEditingProject(false);
@@ -95,43 +115,43 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
     setEditingTagIndex(null);
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
       handleSave();
     }
   };
 
-  const handleClickOutside = (e) => {
+  const handleClickOutside = (e: MouseEvent) => {
     if (
-      titleRef.current && !titleRef.current.contains(e.target) &&
-      descriptionRef.current && !descriptionRef.current.contains(e.target) &&
-      projectRef.current && !projectRef.current.contains(e.target) &&
-      dueDateRef.current && !dueDateRef.current.contains(e.target) &&
-      dueTimeRef.current && !dueTimeRef.current.contains(e.target) &&
-      tagsRef.current && !tagsRef.current.contains(e.target) &&
-      iconMenuRef.current && !iconMenuRef.current.contains(e.target)
+      titleRef.current && !titleRef.current.contains(e.target as Node) &&
+      descriptionRef.current && !descriptionRef.current.contains(e.target as Node) &&
+      projectRef.current && !projectRef.current.contains(e.target as Node) &&
+      dueDateRef.current && !(dueDateRef.current as any).setOpen &&
+      dueTimeRef.current && !(dueTimeRef.current as any).setOpen && 
+      tagsRef.current && !tagsRef.current.contains(e.target as Node) &&
+      iconMenuRef.current && !iconMenuRef.current.contains(e.target as Node)
     ) {
       handleSave();
       setShowIconMenu(false);
     }
   };
 
-  const handleTagEdit = (index) => {
+  const handleTagEdit = (index: number) => {
     setEditingTagIndex(index);
     setEditingTagValue(editTodo.tags[index]);
   };
 
-  const handleTagEditChange = (e) => {
+  const handleTagEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditingTagValue(e.target.value);
   };
 
-  const handleTagEditKeyPress = (e) => {
+  const handleTagEditKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       const updatedTags = [...editTodo.tags];
       if (editingTagValue.trim() === '') {
-        updatedTags.splice(editingTagIndex, 1);
+        updatedTags.splice(editingTagIndex!, 1);
       } else {
-        updatedTags[editingTagIndex] = editingTagValue.trim();
+        updatedTags[editingTagIndex!] = editingTagValue.trim();
       }
       const updatedTodo = {
         ...editTodo,
@@ -147,9 +167,9 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
   const handleTagEditBlur = () => {
     const updatedTags = [...editTodo.tags];
     if (editingTagValue.trim() === '') {
-      updatedTags.splice(editingTagIndex, 1);
+      updatedTags.splice(editingTagIndex!, 1);
     } else {
-      updatedTags[editingTagIndex] = editingTagValue.trim();
+      updatedTags[editingTagIndex!] = editingTagValue.trim();
     }
     const updatedTodo = {
       ...editTodo,
@@ -161,7 +181,7 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
     onSave(updatedTodo);
   };
 
-  const handleProjectChange = (e) => {
+  const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const updatedTodo = {
       ...editTodo,
       project: e.target.value,
@@ -171,7 +191,7 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
     onSave(updatedTodo);
   };
 
-  const handleIconSelect = (icon) => {
+  const handleIconSelect = (icon: any) => {
     setSelectedIcon(icon);
     const updatedTodo = {
       ...editTodo,
@@ -182,21 +202,32 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
     onSave(updatedTodo);
     setShowIconMenu(false);
   };
-  const handleRightClick = (e) => {
+
+  const handleRightClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     setShowIconMenu(true);
   };
-  
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setIsEditingTitle(true);
+    setIsEditingDescription(true);
+    setIsEditingProject(true);
+    setIsEditingDueDate(true);
+    setIsEditingDueTime(true);
+    setIsEditingTags(true);
+  };
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  
+
   return (
     <div
-      className='flex items-center mb-4 rounded-3xl hover:bg-b-white-200 shadow-b-white-200'
+      className={`flex items-center mb-4 rounded-3xl hover:bg-b-white-200 shadow-b-white-200 border-b-2 border-b-white-200 transition-all duration-300 ${isEditing ? 'bg-gray-100 p-4' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onContextMenu={handleRightClick}
@@ -214,7 +245,7 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
       )}
       <div className='flex flex-col flex-grow'>
         <div className='flex flex-row items-center'>
-          {isEditingTitle ? (
+          {isEditing ? (
             <input
               ref={titleRef}
               type='text'
@@ -225,114 +256,119 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
               onKeyPress={handleKeyPress}
               className={`text-md ${completed ? 'line-through' : ''} bg-transparent`}
               style={{ color: projectColor || 'inherit' }}
+              autoFocus
             />
           ) : (
             <span
               className={`text-lg ${completed ? 'line-through' : ''}`}
-              onDoubleClick={() => setIsEditingTitle(true)}
               style={{ color: projectColor || 'inherit' }}
             >
               {title}
             </span>
-  )}
-  {isEditingDueDate ? (
-    <>
-      <FontAwesomeIcon icon={faCalendarAlt} className='text-gray-500 ml-2 text-sm' />
-      <DatePicker
-        ref={dueDateRef}
-        selected={dueDate ? new Date(dueDate) : null}
-        onChange={handleDateChange}
-        onBlur={handleSave}
-        className='text-sm text-gray-500 mb-2 p-0 bg-transparent ml-2'
-        style={{ border: 'none', outline: 'none', color: 'inherit', margin: 0 }}
-        autoFocus
-      />
-    </>
-  ) : (
-    <>
-      <FontAwesomeIcon icon={faCalendarAlt} className='text-gray-500 ml-2 text-sm' />
-      <span
-        className='text-sm text-gray-500 ml-2'
-        onDoubleClick={() => setIsEditingDueDate(true)}
-      >
-        {dueDate ? new Date(dueDate).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' }) : 'No due date'}
-      </span>
-    </>
-  )}
-  {isEditingDueTime ? (
-    <>
-      <FontAwesomeIcon icon={faClock} className='text-gray-500 ml-2 text-sm' />
-      <DatePicker
-        ref={dueTimeRef}
-        selected={dueDate ? new Date(dueDate) : null}
-        onChange={handleTimeChange}
-        onBlur={handleSave}
-        showTimeSelect
-        showTimeSelectOnly
-        timeIntervals={15}
-        timeCaption="Time"
-        dateFormat="h:mm aa"
-        className='text-sm text-gray-500 mb-2 p-0 bg-transparent ml-2'
-        style={{ border: 'none', outline: 'none', color: 'inherit', margin: 0 }}
-        autoFocus
-      />
-    </>
-  ) : (
-    <>
-      <FontAwesomeIcon icon={faClock} className='text-gray-500 ml-2 text-sm' />
-      <span
-        className='text-sm text-gray-500 ml-2'
-        onDoubleClick={() => setIsEditingDueTime(true)}
-      >
-        {dueDate ? new Date(dueDate).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : 'No due time'}
-      </span>
-    </>
-  )}
-</div>
-{isEditingProject ? (
-  <select
-    ref={projectRef}
-    value={editTodo.project}
-    onChange={handleProjectChange}
-    onBlur={handleSave}
-    className='text-sm text-gray-500 mb-2 p-0 bg-transparent w-fit'
-    style={{ border: 'none', outline: 'none', color: 'inherit', margin: 0 }}
-    autoFocus
-  >
-    <option value="No project">No project</option> {/* Add No project option */}
-    {projects.map((project, index) => (
-      <option key={index} value={project.name}> {/* Use project.name */}
-        {project.name}
-      </option>
-    ))}
-  </select>
-) : (
-  <span
-    className='text-sm text-gray-500'
-    onDoubleClick={() => setIsEditingProject(true)}
-  >
-    {project}
-  </span>
-)}
-{isEditingDescription ? (
-  <textarea
-    ref={descriptionRef}
-    name='description'
-    value={editTodo.description}
-    onChange={handleChange}
-    onBlur={handleSave}
-    onKeyPress={handleKeyPress}
-    className='text-sm text-gray-500 mb-2 p-0 bg-transparent'
-    style={{ border: 'none', outline: 'none', color: 'inherit', margin: 0 }}
-    autoFocus
-  />
-) : (
-  <span
-    className='text-sm text-gray-500'
-    onDoubleClick={() => setIsEditingDescription(true)}
-  >
-    {description}
-  </span>
+          )}
+          {(isEditing || dueDate) && (
+            isEditingDueDate ? (
+              <>
+                <FontAwesomeIcon icon={faCalendarAlt} className='text-gray-500 ml-2 text-sm' />
+                <DatePicker
+                  ref={dueDateRef}
+                  selected={dueDate ? new Date(dueDate) : null}
+                  onChange={handleDateChange}
+                  onBlur={handleSave}
+                  className='text-sm text-gray-500 mb-2 p-0 bg-transparent ml-2'
+                  autoFocus
+                />
+              </>
+            ) : (
+              <>
+                <FontAwesomeIcon icon={faCalendarAlt} className='text-gray-500 ml-2 text-sm' />
+                <span
+                  className='text-sm text-gray-500 ml-2'
+                >
+                  {dueDate ? new Date(dueDate).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' }) : 'Set Date'}
+                </span>
+              </>
+            )
+          )}
+          {(isEditing || dueDate) && (
+            isEditingDueTime ? (
+              <>
+                <FontAwesomeIcon icon={faClock} className='text-gray-500 ml-2 text-sm' />
+                <DatePicker
+                  ref={dueTimeRef}
+                  selected={dueDate ? new Date(dueDate) : null}
+                  onChange={handleTimeChange}
+                  onBlur={handleSave}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  timeIntervals={15}
+                  timeCaption="Time"
+                  dateFormat="h:mm aa"
+                  className='text-sm text-gray-500 mb-2 p-0 bg-transparent ml-2'
+                  autoFocus
+                />
+              </>
+            ) : (
+              <>
+                <FontAwesomeIcon icon={faClock} className='text-gray-500 ml-2 text-sm' />
+                <span
+                  className='text-sm text-gray-500 ml-2'
+                >
+                  {dueDate ? new Date(dueDate).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : 'Set Time'}
+                </span>
+              </>
+            )
+          )}
+          {isHovered && !isEditing && (
+            <FontAwesomeIcon
+              icon={faPencil}
+              className='text-gray-500 ml-2 text-sm cursor-pointer'
+              onClick={handleEditClick}
+            />
+          )}
+        </div>
+        {isEditing ? (
+          <select
+            ref={projectRef}
+            value={editTodo.project}
+            onChange={handleProjectChange}
+            onBlur={handleSave}
+            className='text-sm text-gray-500 mb-2 p-0 bg-transparent w-fit'
+            autoFocus
+          >
+            <option value="No project">No project</option> {/* Add No project option */}
+            {projects.map((project, index) => (
+              <option key={index} value={project.name}> {/* Use project.name */}
+                {project.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <span
+            className='text-sm text-gray-500'
+          >
+            {project}
+          </span>
+        )}
+        {(isEditing || description) && (
+          isEditingDescription ? (
+            <textarea
+              ref={descriptionRef}
+              name='description'
+              value={editTodo.description}
+              onChange={handleChange}
+              onBlur={handleSave}
+              onKeyPress={handleKeyPress}
+              className='text-sm text-gray-500 mb-2 p-0 bg-transparent'
+              autoFocus
+            />
+          ) : (
+            <span
+              className='text-sm text-gray-500'
+            >
+              {description || 'Add Description'}
+            </span>
+          )
         )}
       </div>
       <div className='flex flex-row items-center ml-2'>
@@ -347,7 +383,6 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
               onBlur={handleTagEditBlur}
               className='text-sm text-gray-500 mb-2 p-0 bg-transparent'
               size={editingTagValue.length || 1}
-              style={{ border: 'none', outline: 'none', color: 'inherit', margin: 0 }}
               autoFocus
             />
           ) : (
@@ -371,7 +406,6 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
             onBlur={handleSave}
             className='text-sm text-gray-500 mb-2 p-0 bg-transparent'
             size={newTag.length || 1}
-            style={{ border: 'none', outline: 'none', color: 'inherit', margin: 0 }}
             autoFocus
           />
         ) : (
@@ -386,32 +420,29 @@ const TodoItem = ({ todo, onToggle, onUpdate, onSave, isEditing, projects, onPro
         )}
       </div>
       {showIconMenu && (
-  <div ref={iconMenuRef} className='absolute bg-b-white-100 border rounded shadow-lg p-2 flex align-middle'>
-    <FontAwesomeIcon
-      icon={faTimes}
-      className='mx-2 h-4 w-4 cursor-pointer'
-      onClick={() => {
-        setSelectedIcon(null);
-        const updatedTodo = { ...editTodo, icon: null };
-        setEditTodo(updatedTodo);
-        onUpdate(updatedTodo);
-        onSave(updatedTodo);
-        setShowIconMenu(false); // Close the icon menu
-      }}
-    />
-    <div className='border-l-2 border-gray-300 h-6 mx-2'></div> {/* Vertical Line */}
-    {icons.map((icon, index) => (
-      <FontAwesomeIcon
-        key={index}
-        icon={icon}
-        className='mx-2 cursor-pointer'
-        onClick={() => handleIconSelect(icon)}
-      />
-    ))}
-    
-    
-  </div>
-
+        <div ref={iconMenuRef} className='absolute bg-b-white-100 border rounded shadow-lg p-2 flex align-middle'>
+          <FontAwesomeIcon
+            icon={faTimes}
+            className='mx-2 h-4 w-4 cursor-pointer'
+            onClick={() => {
+              setSelectedIcon(null);
+              const updatedTodo = { ...editTodo, icon: null };
+              setEditTodo(updatedTodo);
+              onUpdate(updatedTodo);
+              onSave(updatedTodo);
+              setShowIconMenu(false); // Close the icon menu
+            }}
+          />
+          <div className='border-l-2 border-gray-300 h-6 mx-2'></div> {/* Vertical Line */}
+          {icons.map((icon, index) => (
+            <FontAwesomeIcon
+              key={index}
+              icon={icon}
+              className='mx-2 cursor-pointer'
+              onClick={() => handleIconSelect(icon)}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

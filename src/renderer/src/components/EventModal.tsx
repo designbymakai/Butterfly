@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle } from '@fortawesome/free-solid-svg-icons';
@@ -13,21 +13,52 @@ const formatDateForInput = (date) => {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
-const EventModal = ({ isOpen, onRequestClose, event = {}, onSave }) => {
-  const [title, setTitle] = useState(event.title || '');
-  const [description, setDescription] = useState(event.description || '');
-  const [startTime, setStartTime] = useState(formatDateForInput(event.start) || '');
-  const [endTime, setEndTime] = useState(formatDateForInput(event.end) || '');
-  const [color, setColor] = useState(event.color || '#000000');
+interface Event {
+  title: string;
+  description: string;
+  start: Date;
+  end: Date;
+  color: string;
+}
+
+interface EventModalProps {
+  isOpen: boolean;
+  onRequestClose: () => void;
+  onSave: (event: Event) => void;
+  onDelete: () => void;
+  initialTitle: string;
+  initialStart: Date;
+  initialEnd: Date;
+  initialColor: string;
+  initialDescription: string;
+  event?: Event; // Add this line
+}
+
+const EventModal: React.FC<EventModalProps> = ({
+  isOpen,
+  onRequestClose,
+  onSave,
+  onDelete,
+  initialTitle,
+  initialStart,
+  initialEnd,
+  initialColor,
+  initialDescription, // Add this line
+}) => {
+  const [title, setTitle] = useState(initialTitle);
+  const [description, setDescription] = useState(initialDescription);
+  const [startTime, setStartTime] = useState(formatDateForInput(initialStart));
+  const [endTime, setEndTime] = useState(formatDateForInput(initialEnd));
+  const [color, setColor] = useState(initialColor);
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
 
   useEffect(() => {
-    setTitle(event.title || '');
-    setDescription(event.description || '');
-    setStartTime(formatDateForInput(event.start) || '');
-    setEndTime(formatDateForInput(event.end) || '');
-    setColor(event.color || '#000000');
-  }, [event]);
+    setTitle(initialTitle);
+    setDescription(initialDescription);
+    setStartTime(formatDateForInput(initialStart));
+    setEndTime(formatDateForInput(initialEnd));
+    setColor(initialColor);
+  }, [initialTitle, initialDescription, initialStart, initialEnd, initialColor]);
 
   const handleColorChange = (newColor) => {
     setColor(newColor);
@@ -36,7 +67,6 @@ const EventModal = ({ isOpen, onRequestClose, event = {}, onSave }) => {
 
   const handleSave = () => {
     const updatedEvent = {
-      ...event,
       title,
       description,
       start: new Date(startTime),
@@ -108,6 +138,9 @@ const EventModal = ({ isOpen, onRequestClose, event = {}, onSave }) => {
           </button>
           <button onClick={onRequestClose} className="p-2 bg-red-500 text-white rounded">
             Cancel
+          </button>
+          <button onClick={onDelete} className="p-2 bg-red-500 text-white rounded">
+            Delete
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import EventModal from '../components/EventModal';
 import moment from 'moment';
 
@@ -14,7 +14,15 @@ const saveEventsToLocalStorage = (events) => {
 const EventsTab = () => {
   const [events, setEvents] = useState(loadEventsFromLocalStorage());
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [editingEvent, setEditingEvent] = useState(null);
+  interface Event {
+    title: string;
+    start: string;
+    end: string;
+    color: string;
+    description: string;
+  }
+  
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
   useEffect(() => {
     saveEventsToLocalStorage(events);
@@ -30,11 +38,11 @@ const EventsTab = () => {
     setModalIsOpen(true);
   };
 
-  const handleSaveEvent = (title, start, end, color, description) => {
+  const handleSaveEvent = (event) => {
     if (editingEvent) {
-      setEvents(events.map(ev => (ev === editingEvent ? { ...ev, title, start, end, color, description } : ev)));
+      setEvents(events.map(ev => (ev === editingEvent ? event : ev)));
     } else {
-      setEvents([...events, { start, end, title, color, description }]);
+      setEvents([...events, event]);
     }
     setEditingEvent(null);
   };
@@ -47,7 +55,7 @@ const EventsTab = () => {
   };
 
   // Sort events by start date
-  const sortedEvents = events.sort((a, b) => new Date(a.start) - new Date(b.start));
+  const sortedEvents = events.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
   return (
     <div className='overflow-y-auto h-full pr-2'>
