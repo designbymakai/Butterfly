@@ -7,3 +7,4 @@ out
 *.env
 Butterfly.git
 Butterfly.git.bfg-report/
+electron.vite.config.*.mjs
