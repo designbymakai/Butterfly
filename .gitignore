@@ -5,3 +5,5 @@ out
 *.log*
 .env
 *.env
+Butterfly.git
+Butterfly.git.bfg-report/
