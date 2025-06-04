@@ -16,7 +16,7 @@ const EditProjectsModal = ({ isOpen, onRequestClose, projects, setProjects }) =>
     if (newProjectName.trim() !== '') {
       setProjects([...projects, { name: newProjectName.trim(), color: newProjectColor }]);
       setNewProjectName('');
-      setNewProjectColor('#000000'); // Reset color
+      setNewProjectColor('# '); // Reset color
     }
   };
 

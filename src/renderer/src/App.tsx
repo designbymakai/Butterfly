@@ -39,51 +39,51 @@ function App() {
           <div className="flex flex-col justify-between h-screen bg-b-black-200 text-white w-fit">
             <div className="flex flex-col space-y-4 p-4">
               <button
-                className={`h-1/12 w-full group py-4 px-6 rounded hover:bg-b-white-100 hover:text-b-green-300 transition hover:scale-110 ${
+                className={`h-1/12 w-full group py-4 px-4 rounded hover:bg-b-white-100 hover:text-b-green-300 transition hover:scale-110 ${
                   activeComponent === 'Home' ? 'bg-b-white-100 text-b-green-300' : ''
                 }`}
                 onClick={() => setActiveComponent('Home')}
                 style={{ maxHeight: '80px' }}
               >
-                <FontAwesomeIcon icon={faHome} className="text-3xl transition duration-500" />
+                <FontAwesomeIcon icon={faHome} className="text-2xl transition duration-500" />
               </button>
               <button
-                className={`group py-4 px-6 rounded hover:bg-b-white-100 hover:text-b-green-300 transition hover:scale-110 ${
+                className={`group py-4 px-4 rounded hover:bg-b-white-100 hover:text-b-green-300 transition hover:scale-110 ${
                   activeComponent === 'Todo' ? 'bg-b-white-100 text-b-green-300' : ''
                 }`}
                 onClick={() => setActiveComponent('Todo')}
                 style={{ maxHeight: '80px' }}
               >
-                <FontAwesomeIcon icon={faClipboard} className="text-3xl transition duration-500" />
+                <FontAwesomeIcon icon={faClipboard} className="text-2xl transition duration-500" />
               </button>
               <button
-                className={`group py-4 px-6 rounded hover:bg-b-white-100 hover:text-b-green-300 transition hover:scale-110 ${
+                className={`group py-4 px-4 rounded hover:bg-b-white-100 hover:text-b-green-300 transition hover:scale-110 ${
                   activeComponent === 'Projects' ? 'bg-b-white-100 text-b-green-300' : ''
                 }`}
                 onClick={() => setActiveComponent('Projects')}
                 style={{ maxHeight: '80px' }}
               >
-                <FontAwesomeIcon icon={faProjectDiagram} className="text-3xl transition duration-500" />
+                <FontAwesomeIcon icon={faProjectDiagram} className="text-2xl transition duration-500" />
               </button>
               <button
-                className={`group py-4 px-6 rounded hover:bg-b-white-100 hover:text-b-green-300 transition hover:scale-110 ${
+                className={`group py-4 px-4 rounded hover:bg-b-white-100 hover:text-b-green-300 transition hover:scale-110 ${
                   activeComponent === 'Cal' ? 'bg-b-white-100 text-b-green-300' : ''
                 }`}
                 onClick={() => setActiveComponent('Cal')}
                 style={{ maxHeight: '80px' }}
               >
-                <FontAwesomeIcon icon={faCalendar} className="text-3xl transition duration-500" />
+                <FontAwesomeIcon icon={faCalendar} className="text-2xl transition duration-500" />
               </button>
             </div>
             <div className="p-4 pb-8">
               <button
-                className={`group py-4 px-6 rounded hover:bg-b-white-100 hover:text-b-green-300 ${
+                className={`group py-4 px-4 rounded hover:bg-b-white-100 hover:text-b-green-300 ${
                   activeComponent === 'Settings' ? 'bg-b-white-100 text-b-green-300' : ''
                 }`}
                 onClick={() => setActiveComponent('Settings')}
                 style={{ maxHeight: '80px' }}
               >
-                <FontAwesomeIcon icon={faCog} className="text-3xl transition duration-500" />
+                <FontAwesomeIcon icon={faCog} className="text-2xl transition duration-500" />
               </button>
             </div>
           </div>
