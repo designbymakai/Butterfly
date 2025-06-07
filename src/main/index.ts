@@ -71,7 +71,7 @@ ipcMain.handle('fetch-openai-response', async (_, input, userApiKey?) => {
           ...additionalHeaders
         },
         body: JSON.stringify({
-          model: 'gpt-4o-2024-08-06',
+          model: 'gpt-4o',
           messages: [
             { role: 'system', content: 'Butterfly is a helpful productivity assistant' },
             {
@@ -99,7 +99,7 @@ ipcMain.handle('fetch-openai-response', async (_, input, userApiKey?) => {
             {
               role: 'system',
               content:
-                'A task has been created: {"id": "placeholder-id", "title": "Create Mockup Logo for Startup", "description": "Design a mockup logo for the startup project. Make sure to explore different variations and concepts.", "dueDate": "2024-09-16T12:00:00.000Z", "tags": ["design", "branding", "logo"], "completed": false'
+                'A task has been created: {"id": "placeholder-id", "title": "Create Mockup Logo for Startup", "description": "Design a mockup logo for the startup project. Make sure to explore different variations and concepts.", "dueDate": "2024-09-16T12:00:00.000Z", "tags": ["design", "branding", "logo"], "completed": false}'
             },
             { role: 'user', content: input }
           ],
