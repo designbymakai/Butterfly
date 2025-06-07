@@ -223,6 +223,8 @@ const Todo = forwardRef((_, ref) => {
       />
     </div>
   );
+  
 });
+Todo.displayName = 'Todo';
 
 export default Todo;
