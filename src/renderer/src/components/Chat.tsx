@@ -79,7 +79,7 @@ When the user asks you to Create a Task, respond in the following format: {
 
     const chatGPTKey = localStorage.getItem('chatGPTKey') || '';
     const userMessage: Message = { sender: 'user', content };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
 
     const { tasks, events } = fetchTasksAndEvents();
     const formattedData = formatTasksAndEvents(tasks, events);
@@ -158,6 +158,9 @@ When the user asks you to Create a Task, respond in the following format: {
 
       setMessages((prevMessages) => [...prevMessages, botMessage]);
     } catch (error) {
+      if (error && error.message && error.message.includes('Unexpected token')) {
+        alert('Received an HTML error page from the server—your backend may be down or misconfigured.');
+      }
       console.error('Error fetching response from ChatGPT:', error);
     }
 

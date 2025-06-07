@@ -3,6 +3,8 @@
 This is the backend API server for the Butterfly app.  
 It acts as a secure proxy between your frontend app (Electron/React) and the OpenAI API, so your sensitive API keys are never exposed to the client.
 
+Backend hosted on Render.com
+
 ---
 
 ## Features
