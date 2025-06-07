@@ -2,14 +2,14 @@ import './assets/main.css';
 
 import Home from './pages/Home';
 import Todo from './pages/Todo';
-import Projects from './pages/Projects'; // Import the new Projects page
+import Projects from './pages/Projects';
 import Cal from './pages/Calendar';
 import Settings from './pages/Settings';
 import ErrorBoundary from './components/ErrrorBoundry';
 import { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faClipboard, faProjectDiagram, faCalendar, faCog } from '@fortawesome/free-solid-svg-icons'; // Import faProjectDiagram icon
 import { TaskProvider } from './context/TaskContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faClipboard, faProjectDiagram, faCalendar, faCog } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
   const [activeComponent, setActiveComponent] = useState('Home');
@@ -17,17 +17,17 @@ function App() {
   const renderComponent = () => {
     switch (activeComponent) {
       case 'Home':
-        return <Home />;
+        return <Home onNavigate={(destination) => setActiveComponent(destination)} />;
       case 'Todo':
         return <Todo />;
-      case 'Projects': // Add case for Projects
+      case 'Projects':
         return <Projects />;
       case 'Cal':
         return <Cal />;
       case 'Settings':
         return <Settings />;
       default:
-        return <Home />;
+        return <Home onNavigate={(destination) => setActiveComponent(destination)} />;
     }
   };
 
@@ -89,7 +89,9 @@ function App() {
           </div>
           {/* Navigation end */}
           <div className="flex-auto">
-            <div className="flex justify-center items-center h-full space-y-4">{renderComponent()}</div>
+            <div className="flex justify-center items-center h-full space-y-4">
+              {renderComponent()}
+            </div>
           </div>
         </div>
       </TaskProvider>

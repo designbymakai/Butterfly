@@ -3,10 +3,15 @@
   height: 100%; /* Full viewport height */
   display: flex;
   flex-direction: column;
-  border-radius: 1.5rem;
   padding: 1rem;
 }
-
+.rbc-time-content {
+  border: none !important; /* Remove borders from time content */
+  scrollbar-width: none;
+}
+.rbc-time-header-content, .rbc-time-header.rbc-overflowing {
+  border: none;
+}
 .rbc-event {
   background-color: #1e3a8a; /* Background color for events */
   color: white; /* Text color for events */
@@ -16,6 +21,18 @@
   overflow: hidden; /* Ensure text does not overflow */
   white-space: nowrap; /* Prevent text from wrapping */
   text-overflow: ellipsis; /* Add ellipsis for overflow text */
+}
+.rbc-show-more {
+  background: none;
+}
+button.rbc-button-link.rbc-show-more  {
+  color: #5a7c35 !important;
+  
+}
+
+button.rbc-button-link.rbc-show-more:hover  {
+  color: #779a53 !important;
+  
 }
 
 .rbc-event-content {
@@ -82,7 +99,6 @@
 .rbc-time-header-cell, 
 .rbc-time-content > * + * > * {
   border: none;
-  border-radius: 3px;
 }
 
 .rbc-header, 
@@ -93,14 +109,14 @@
 
 .rbc-today {
   border: none;
-  background-color: #d9d9d9;
+  background-color: #343D3F;
 }
 
 .rbc-day-bg + .rbc-day-bg {
   border: none;
 }
 .rbc-day-bg + .rbc-day-bg:hover {
-  background-color: #f2f1f1;
+  background-color: #84C0C4;
 }
 
 .rbc-month-view, 
@@ -205,23 +221,45 @@
   color: #FC7753;
 }
 .rbc-toolbar .rbc-toolbar-label{
-  color: #343d3f;
+  color: #D9D9D9;
+  font-weight: bold;
+}
+.rbc-label{
+  color: #D9D9D9;
   font-weight: bold;
 }
 
+.rbc-toolbar-label{
+  font-size: 2rem;
+}
+
 .rbc-header, .rbc-header + .rbc-header, .rbc-header + .rbc-header + .rbc-header{
-  color: #343d3f;
+  color: #D9D9D9;
 }
 
 /* New styles for tasks */
 .rbc-task {
   background-color: #ffeb3b; /* Background color for tasks */
-  color: #000; /* Text color for tasks */
+  color: #D9D9D9; /* Text color for tasks */
   border: 2px dashed #000; /* Dashed border for tasks */
   padding: 5px; /* Padding inside tasks */
-  border-radius: 4px; /* Rounded corners for tasks */
+  border-radius: 8px; /* Rounded corners for tasks */
   font-size: 14px; /* Font size for task text */
   overflow: hidden; /* Ensure text does not overflow */
   white-space: nowrap; /* Prevent text from wrapping */
   text-overflow: ellipsis; /* Add ellipsis for overflow text */
+}
+
+.rbc-time-slot {
+  border: none !important;
+}
+
+/* Optionally remove top border if any */
+.rbc-time-slot:first-child {
+  border: none !important;
+}
+
+.rbc-timeslot-group {
+  border: none !important;
+
 }

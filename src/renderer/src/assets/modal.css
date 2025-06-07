@@ -1,0 +1,63 @@
+.standard-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;         /* shrunk from 50% to 40% */
+  max-width: 20%;   /* shrunk from 500px to 400px */
+  background: #343D3F;
+  padding: 20px;
+  border-radius: 10px;
+  outline: none;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.event-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;         /* same new width as standard-modal */
+  max-width: 20%;   /* same new max-width as standard-modal */
+  background: #343D3F;
+  padding: 20px;
+  border-radius: 10px;
+  outline: none;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.standard-overlay, .event-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+}
+
+.color-picker-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  max-width: 20%;
+  transform: translate(-50%, -50%);
+  background: #343D3F;
+  padding: 20px;
+  border-radius: 10px;
+  outline: none;
+  z-index: 1001;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}

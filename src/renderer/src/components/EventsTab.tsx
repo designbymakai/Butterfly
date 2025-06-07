@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import EventModal from '../components/EventModal';
 import moment from 'moment';
+import { getRandomProjectColor } from '../utils/projectColors';
 
 const loadEventsFromLocalStorage = () => {
   const events = localStorage.getItem('events');
@@ -59,7 +60,7 @@ const EventsTab = () => {
 
   return (
     <div className='overflow-y-auto h-full pr-2'>
-      <button onClick={handleAddEvent} className='mb-4 p-2 bg-blue-500 text-white rounded'>Add Event</button>
+      <button onClick={handleAddEvent} className='mb-4 p-2 bg-b-blue-500 text-white rounded'>Add Event</button>
       <div className='flex flex-col'>
         {sortedEvents.map((event, index) => (
           <div
@@ -87,7 +88,7 @@ const EventsTab = () => {
         initialTitle={editingEvent ? editingEvent.title : ''}
         initialStart={editingEvent ? new Date(editingEvent.start) : new Date()}
         initialEnd={editingEvent ? new Date(editingEvent.end) : new Date()}
-        initialColor={editingEvent ? editingEvent.color : '#000000'}
+        initialColor={editingEvent ? editingEvent.color : getRandomProjectColor()}
         initialDescription={editingEvent ? editingEvent.description : ''}
       />
     </div>

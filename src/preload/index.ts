@@ -3,7 +3,8 @@ import { electronAPI } from '@electron-toolkit/preload';
 
 // Custom APIs for renderer
 const api = {
-  fetchOpenAIResponse: (input: string) => ipcRenderer.invoke('fetch-openai-response', input),
+  fetchOpenAIResponse: (input: string, userApiKey: string) =>
+    ipcRenderer.invoke('fetch-openai-response', input, userApiKey),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

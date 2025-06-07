@@ -3,7 +3,7 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   line-height: 1.6;
   padding: 1em;
-  color: #24292e;
+  color: #fff;
 }
 
 .markdown-body h1,
@@ -34,7 +34,8 @@
 
 .markdown-body blockquote {
   padding: 0 1em;
-  color: #6a737d;
+  margin-top: .5em;
+  color: #d9d9d9;
   border-left: 0.25em solid #dfe2e5;
 }
 
@@ -72,12 +73,11 @@
 }
 
 .markdown-body tr {
-  background-color: #fff;
+  
   border-top: 1px solid #c6cbd1;
 }
 
 .markdown-body tr:nth-child(2n) {
-  background-color: #f6f8fa;
 }
 
 /* List styles */
@@ -114,14 +114,424 @@
 .markdown-body h1 {
   font-size: 2em;
   margin-bottom: 0.5em;
+  color:#92c7cb;
 }
 
 .markdown-body h2 {
   font-size: 1.5em;
   margin-bottom: 0.5em;
+  color:#ff9577;
 }
 
 .markdown-body h3 {
   font-size: 1.2em;
   margin-bottom: 0.5em;
+  color:#85a567;
+}
+
+.react-markdown-editor-lite {
+  background-color: #1e1e1e !important; /* A dark background */
+  border: 1px solid #444 !important;
+}
+
+.react-markdown-editor-lite .editor-container {
+  background-color: #1e1e1e !important;
+}
+
+.react-markdown-editor-lite .input {
+  background-color: #1e1e1e !important;
+  color: #fff !important; /* White text */
+  border: 1px solid #444 !important;
+}
+.rc-md-editor {
+  background-color: #1F292B !important;
+}
+
+/* Ensure the markdown editor takes full width */
+.react-markdown-editor-lite,
+.react-markdown-editor-lite .editor,
+.react-markdown-editor-lite .editor-container,
+.react-markdown-editor-lite .input {
+  width: 100% !important;
+}
+
+/* Set the overall background to #1F292B */
+.react-markdown-editor-lite {
+  background-color: #1F292B !important;
+  border: none !important;
+}
+
+/* Editor container should match the background */
+.react-markdown-editor-lite .editor-container {
+  background-color: #1F292B !important;
+}
+
+/* Input section with white-ish text for better contrast */
+.react-markdown-editor-lite .input {
+  background-color: #1F292B !important;
+  color: #F2F1F1 !important;
+  border: none !important;
+}
+
+/* Style the menu container (toolbar) */
+.react-markdown-editor-lite .menu-container {
+  background-color: #1F292B !important;
+  border-top: 1px solid #444 !important;
+}
+
+/* Force icons/buttons in the toolbar to have the color #F2F1F1 */
+.react-markdown-editor-lite .button {
+  color: #F2F1F1 !important;
+}
+
+.react-markdown-editor-lite .button:hover {
+  color: #ccc !important;
+}
+/* Full width override */
+.react-markdown-editor-lite,
+.react-markdown-editor-lite .editor,
+.react-markdown-editor-lite .editor-container,
+.react-markdown-editor-lite .input {
+  width: 100% !important;
+}
+
+/* Set your background color */
+.react-markdown-editor-lite {
+  background-color: #1F292B !important;
+}
+
+/* Override input area background and text color */
+.react-markdown-editor-lite .input {
+  background-color: #1F292B !important;
+  color: #F2F1F1 !important;
+}
+
+/* Toolbar (menu) customizations */
+.react-markdown-editor-lite .menu-container {
+  background-color: #1F292B !important;
+  border-top: 1px solid #444 !important;
+}
+
+/* Custom icon color override */
+.react-markdown-editor-lite .button {
+  color: #F2F1F1 !important;
+}
+
+.react-markdown-editor-lite .button:hover {
+  color: #ccc !important;
+}
+
+
+
+
+
+
+/* ICON FONT (BASE64 data omitted for clarity—keep as needed) */
+@font-face {
+  font-family: rmel-iconfont;
+  src: url(data:application/vnd.ms-fontobject;base64,...);
+  /* Additional font formats... */
+  font-style: normal;
+  font-weight: normal;
+}
+
+.rmel-iconfont {
+  font-family: rmel-iconfont !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Icon classes, use as needed */
+.rmel-icon-tab:before { content: "\e76d"; }
+.rmel-icon-keyboard:before { content: "\ed80"; }
+.rmel-icon-delete:before { content: "\ed3c"; }
+/* ...etc... */
+
+/* ============================= */
+/* Editor Layout and Appearance  */
+/* ============================= */
+.rc-md-editor {
+  padding-bottom: 1px;
+  position: relative;
+  border: 1px solid #e0e0e0;
+  background: #1e1e1e;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.rc-md-editor.full {
+  width: 100%;
+  height: 100% !important;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Editor sections */
+.rc-md-editor .editor-container {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  position: relative;
+}
+.rc-md-editor .editor-container > .section {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 1px;
+  border-right: 1px solid #e0e0e0;
+}
+.rc-md-editor .editor-container > .section.in-visible {
+  display: none;
+}
+.rc-md-editor .editor-container > .section > .section-container {
+  padding: 10px 15px 15px;
+}
+
+/* Markdown Input Area */
+.rc-md-editor .editor-container .sec-md .input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  border: none;
+  resize: none;
+  outline: none;
+  min-height: 0;
+  background: #1F292B;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Markdown Preview */
+.custom-html-style {
+  color: #333;
+}
+.custom-html-style h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 32px 0;
+  line-height: 1.2;
+}
+.custom-html-style h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 24px 0;
+  line-height: 1.7;
+}
+.custom-html-style h3 {
+  font-size: 18px;
+  margin: 18px 0;
+  line-height: 1.7;
+}
+.custom-html-style p {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 8px 0;
+}
+.custom-html-style a {
+  color: #0052d9;
+}
+.custom-html-style a:hover {
+  text-decoration: none;
+}
+.custom-html-style strong {
+  font-weight: 700;
+}
+.custom-html-style ol,
+.custom-html-style ul {
+  font-size: 14px;
+  line-height: 28px;
+  padding-left: 36px;
+}
+.custom-html-style li {
+  margin-bottom: 8px;
+  line-height: 1.7;
+}
+.custom-html-style hr {
+  margin: 20px 0;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+.custom-html-style pre {
+  display: block;
+  padding: 20px;
+  line-height: 28px;
+  word-break: break-word;
+  background-color: #1F292B;
+  font-size: 14px;
+  border-radius: 0;
+  overflow-x: auto;
+}
+.custom-html-style code {
+  background-color: #1F292B;
+  font-size: 14px;
+  border-radius: 0;
+  padding: 3px 0;
+  margin: 0;
+  word-break: normal;
+}
+.custom-html-style blockquote {
+  margin: 16px 0;
+  padding: 5px 8px 5px 30px;
+  background: rgba(102, 128, 153, .05);
+  color: #333;
+  border: none;
+  border-left: 10px solid #d6dbdf;
+}
+.custom-html-style img,
+.custom-html-style video {
+  max-width: 100%;
+}
+.custom-html-style table {
+  font-size: 14px;
+  line-height: 1.7;
+  max-width: 100%;
+  border: 1px solid #f6f6f6;
+  border-collapse: collapse;
+}
+.custom-html-style table td,
+.custom-html-style table th {
+  word-break: break-all;
+  padding: 10px 15px;
+  border: 1px solid #efefef;
+}
+.custom-html-style table th {
+  text-align: center;
+  font-weight: 700;
+  background-color: #1F292B;
+}
+.custom-html-style table tr:nth-child(2n) {
+  background-color: transparent;
+}
+
+/* ================== */
+/* Toolbar & Buttons  */
+/* ================== */
+.rc-md-editor .rc-md-navigation {
+  min-height: 38px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  font-size: 16px;
+  background: #1F292B;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+}
+
+.rc-md-editor .rc-md-navigation .button-wrap,
+.rc-md-editor .rc-md-navigation .navigation-nav {
+  display: flex;
+  flex-direction: row;
+}
+
+.rc-md-editor .rc-md-navigation .button-wrap {
+  flex-wrap: wrap;
+}
+.rc-md-editor .rc-md-navigation .button-wrap .button {
+  min-width: 24px;
+  height: 28px;
+  margin: 0 3px;
+  display: inline-block;
+  cursor: pointer;
+  line-height: 28px;
+  text-align: center;
+  color: #757575;
+}
+.rc-md-editor .rc-md-navigation .button-wrap .button:hover {
+  color: #212121;
+}
+.rc-md-editor .rc-md-navigation .button-wrap .button.disabled {
+  color: #bdbdbd;
+  cursor: not-allowed;
+}
+.rc-md-editor .rc-md-navigation .button-wrap .rmel-iconfont {
+  font-size: 18px;
+}
+
+/* Table/List UI Styles (optional) */
+.rc-md-editor .table-list.wrap .list-item,
+.rc-md-editor .tab-map-list .list-item {
+  width: 20px;
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+}
+.rc-md-editor .table-list.wrap .list-item.active,
+.rc-md-editor .tab-map-list .list-item.active {
+  background: #9e9e9e;
+  font-weight: 700;
+}
+
+/* Hide elements when needed */
+.rc-md-editor .drop-wrap.hidden,
+.rc-md-editor .rc-md-navigation.in-visible {
+  display: none !important;
+}
+
+/* Custom utility styles */
+.rc-md-editor .rc-md-divider {
+  width: 1px;
+  background-color: #e0e0e0;
+}
+
+/* Ensure that all toolbar buttons are #F2F1F1, even on hover */
+.react-markdown-editor-lite .button,
+.rc-md-editor .rc-md-navigation .button-wrap .button {
+  color: #F2F1F1 !important;
+}
+
+.react-markdown-editor-lite .button:hover,
+.rc-md-editor .rc-md-navigation .button-wrap .button:hover {
+  color: #F2F1F1 !important;
+}
+/* Force toolbar button icons to use the light color */
+.rc-md-editor .rc-md-navigation .button-wrap .button,
+.rc-md-editor .rc-md-navigation .tool-bar .button,
+.react-markdown-editor-lite .menu-container .button,
+.react-markdown-editor-lite .button {
+  color: #F2F1F1 !important;
+}
+
+.rc-md-editor .rc-md-navigation .button-wrap .button::before,
+.rc-md-editor .rc-md-navigation .tool-bar .button::before,
+.react-markdown-editor-lite .menu-container .button::before,
+.react-markdown-editor-lite .button::before {
+  color: #F2F1F1 !important;
+}
+
+.rc-md-editor .rc-md-navigation .button-wrap .button:hover,
+.rc-md-editor .rc-md-navigation .tool-bar .button:hover,
+.react-markdown-editor-lite .menu-container .button:hover,
+.react-markdown-editor-lite .button:hover {
+  color: #F2F1F1 !important;
+}
+.react-markdown-editor-lite .button {
+  color: #F2F1F1 !important; /* Force button text color */
+}
+
+.MDXEditor {
+  background-color: #1F292B !important;
+  color: #F2F1F1 !important;
+  width: 100%;
+  border: none;
+}
+
+.MDXEditor textarea {
+  background-color: #1F292B !important;
+  color: #F2F1F1 !important;
+}
+
+.MDXEditor .toolbar button {
+  color: #F2F1F1 !important;
+}
+
+.MDXEditor .toolbar button:hover {
+  color: #F2F1F1 !important;
 }

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCircle, faClose, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import ColorPickerModal from './ColorPickerModal';
+import { getRandomProjectColor } from '../utils/projectColors';
+import '../assets/Modal.css';
 
-Modal.setAppElement('#root'); // Set the root element for accessibility
+Modal.setAppElement('#root');
 
 const formatDateForInput = (date) => {
   if (!date) return '';
@@ -31,7 +33,7 @@ interface EventModalProps {
   initialEnd: Date;
   initialColor: string;
   initialDescription: string;
-  event?: Event; // Add this line
+  event?: Event;
 }
 
 const EventModal: React.FC<EventModalProps> = ({
@@ -43,13 +45,26 @@ const EventModal: React.FC<EventModalProps> = ({
   initialStart,
   initialEnd,
   initialColor,
-  initialDescription, // Add this line
+  initialDescription,
 }) => {
+  
+  // If initialColor is undefined or an empty string, use a random project color
+const defaultColor =
+  initialColor &&
+  initialColor.trim() !== '' &&
+  initialColor !== '#000000'
+    ? initialColor
+    : getRandomProjectColor();
+    
+    useEffect(() => {
+  console.log("Using default color:", defaultColor);
+}, [defaultColor]);
+
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [startTime, setStartTime] = useState(formatDateForInput(initialStart));
   const [endTime, setEndTime] = useState(formatDateForInput(initialEnd));
-  const [color, setColor] = useState(initialColor);
+  const [color, setColor] = useState(defaultColor);
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
 
   useEffect(() => {
@@ -57,7 +72,7 @@ const EventModal: React.FC<EventModalProps> = ({
     setDescription(initialDescription);
     setStartTime(formatDateForInput(initialStart));
     setEndTime(formatDateForInput(initialEnd));
-    setColor(initialColor);
+    setColor(initialColor && initialColor.trim() !== '' ? initialColor : getRandomProjectColor());
   }, [initialTitle, initialDescription, initialStart, initialEnd, initialColor]);
 
   const handleColorChange = (newColor) => {
@@ -66,7 +81,7 @@ const EventModal: React.FC<EventModalProps> = ({
   };
 
   const handleSave = () => {
-    const updatedEvent = {
+    const updatedEvent: Event = {
       title,
       description,
       start: new Date(startTime),
@@ -85,61 +100,62 @@ const EventModal: React.FC<EventModalProps> = ({
       className="event-modal"
       overlayClassName="event-overlay"
     >
-      <div className="flex flex-col items-center p-4">
-        <h2 className="text-xl mb-4">Edit Event</h2>
+      <div className="flex flex-col items-center pb-4">
+        <h2 className="text-xl mb-4 text-b-white-100">New Event</h2>
         <div className="flex items-center mb-4">
-          <span className="mr-2">Color:</span>
+          <span className="mr-2 text-b-white-100">Color:</span>
           <FontAwesomeIcon
-            icon={faCircle}
-            color={color}
-            size="2x"
-            onClick={() => setIsColorPickerOpen(true)}
-            className="cursor-pointer"
+              icon={faCircle}
+              style={{ color: defaultColor }}
+              size="2x"
+              onClick={() => setIsColorPickerOpen(true)}
+              className="cursor-pointer"
           />
         </div>
+        {/* The rest of your form */}
         <div className="mb-4 w-full">
-          <label className="block text-left mb-2">Title</label>
+          <label className="block text-left mb-2 text-b-white-100">Title</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-b-white-100"
           />
         </div>
         <div className="mb-4 w-full">
-          <label className="block text-left mb-2">Description</label>
+          <label className="block text-left mb-2 text-b-white-100">Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-b-white-100"
           />
         </div>
         <div className="mb-4 w-full">
-          <label className="block text-left mb-2">Start Time</label>
+          <label className="block text-left mb-2 text-b-white-100">Start Time</label>
           <input
             type="datetime-local"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-b-white-500"
           />
         </div>
-        <div className="mb-4 w-full">
+        <div className="mb-4 w-full text-b-white-100">
           <label className="block text-left mb-2">End Time</label>
           <input
             type="datetime-local"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded text-b-white-500"
           />
         </div>
-        <div className="flex justify-end w-full">
-          <button onClick={handleSave} className="mr-2 p-2 bg-green-500 text-white rounded">
+        <div className="flex justify-end w-full mx-auto">
+          <button onClick={handleSave} className="mx-2 px-2 py-1 bg-b-green-500 hover:bg-b-green-300 text-b-white-200 rounded">
             Save
           </button>
-          <button onClick={onRequestClose} className="p-2 bg-red-500 text-white rounded">
+          <button onClick={onRequestClose} className="mx-2 px-2 py-1 bg-b-blue-500 hover:bg-b-blue-300 text-b-white-200 rounded">
             Cancel
           </button>
-          <button onClick={onDelete} className="p-2 bg-red-500 text-white rounded">
+          <button onClick={onDelete} className="mx-2 px-2 py-1 bg-b-orange-500 hover:bg-b-orange-300 text-b-white-200 rounded">
             Delete
           </button>
         </div>

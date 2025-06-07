@@ -77,6 +77,7 @@ When the user asks you to Create a Task, respond in the following format: {
     const content = messageContent || input;
     if (!content.trim()) return;
 
+    const chatGPTKey = localStorage.getItem('chatGPTKey') || '';
     const userMessage: Message = { sender: 'user', content };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
@@ -86,7 +87,7 @@ When the user asks you to Create a Task, respond in the following format: {
     console.log('Final Prompt:', finalPrompt);
 
     try {
-      const response = await (window.api as any).fetchOpenAIResponse(finalPrompt);
+      const response = await (window.api as any).fetchOpenAIResponse(finalPrompt, chatGPTKey);
 
       console.log('ChatGPT Response:', response);
 

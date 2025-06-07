@@ -114,7 +114,7 @@ const Cal = () => {
   };
 
   return (
-    <div className='w-full h-full bg-b-white-100 rounded-3xl'>
+    <div className='w-full h-full rounded-3xl'>
       <div className="calendar-container">
         <WorkCal
           localizer={localizer}

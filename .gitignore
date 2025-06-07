@@ -1,10 +1,24 @@
-node_modules
+# Node/Electron/React defaults
+node_modules/
 dist
 out
 .DS_Store
 *.log*
+npm-debug.log*
 .env
 *.env
+
+# Git & BFG artifacts
 Butterfly.git
 Butterfly.git.bfg-report/
+
+# Electron Vite config
 electron.vite.config.*.mjs
+
+# VSCode/IDE/editor
+.vscode/
+.idea/
+.history/
+
+# OS junk
+Thumbs.db

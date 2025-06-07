@@ -18,7 +18,7 @@ const Projects = () => {
   }, [projects]);
 
   return (
-    <div className='w-full h-full p-4 bg-b-white-100 rounded-3xl overflow-scroll no-scrollbar'>
+    <div className='w-full h-full p-4 rounded-3xl overflow-scroll no-scrollbar'>
       <ProjectsTab
         todos={todos}
         setTodos={setTodos}

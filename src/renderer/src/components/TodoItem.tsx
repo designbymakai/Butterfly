@@ -59,6 +59,7 @@ interface TodoItemProps {
   projects: any;
   onProjectClick: (projectName: string) => void;
   projectColor: any;
+  tagColors?: Record<string, string>; // add this prop
 }
 
 const TodoItem: React.FC<TodoItemProps> = ({
@@ -67,7 +68,9 @@ const TodoItem: React.FC<TodoItemProps> = ({
   onUpdate,
   onSave,
   projects,
+  onProjectClick,
   projectColor,
+  tagColors,
 }) => {
   const { 
     id = uuidv4(), 
@@ -203,7 +206,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   return (
-    <div className="flex items-center mb-4 rounded-3xl hover:bg-b-black-300 shadow-b-white-200 transition-all duration-300 p-2">
+    <div className="flex items-center mb-2 rounded-3xl hover:bg-b-black-300 shadow-b-white-200 transition-all duration-300 p-2">
       {icon ? (
         <FontAwesomeIcon
           icon={icon}
@@ -316,9 +319,8 @@ const TodoItem: React.FC<TodoItemProps> = ({
               ) : (
                 <span
                   key={index}
-                  className="text-sm mr-2 rounded-xl px-1.5 cursor-pointer inline-block text-b-black-400"
+                  className="text-sm mr-2 rounded-xl px-1.5 cursor-pointer inline-block text-b-white-600"
                   onClick={() => handleTagEdit(index)}
-                  style={{ backgroundColor: getPastelColorForTag(tag) }}
                 >
                   #{tag}
                 </span>
@@ -356,14 +358,14 @@ const TodoItem: React.FC<TodoItemProps> = ({
             onKeyPress={handleDescriptionKeyPress}
             onBlur={handleDescriptionBlur}
             className="text-sm text-b-black-600 bg-transparent"
-            style={{ minHeight: '40px' }}
+            style={{ height: 'fit' }}
             autoFocus
           />
         ) : (
           <span
             className="text-sm text-b-white-400 inline-block"
             onDoubleClick={handleDescriptionDoubleClick}
-            style={{ minHeight: '40px' }}
+            style={{ height: 'fit' }}
           >
             {description || 'Add Description'}
           </span>
