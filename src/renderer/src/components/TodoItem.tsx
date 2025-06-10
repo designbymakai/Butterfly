@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faBell, 
@@ -22,7 +22,6 @@ import { v4 as uuidv4 } from 'uuid';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-// Helper: generate a consistent pastel color from a string.
 const getPastelColorForTag = (tag: string): string => {
   let hash = 0;
   for (let i = 0; i < tag.length; i++) {
@@ -32,7 +31,6 @@ const getPastelColorForTag = (tag: string): string => {
   return `hsl(${hue}, 70%, 85%)`;
 };
 
-// CustomInput uses the native "size" attribute so it only takes as much space as its content.
 const CustomInput = React.forwardRef<HTMLInputElement, any>((props, ref) => {
   const { value, style, ...rest } = props;
   return (
@@ -59,7 +57,7 @@ interface TodoItemProps {
   projects: any;
   onProjectClick: (projectName: string) => void;
   projectColor: any;
-  tagColors?: Record<string, string>; // add this prop
+  tagColors?: Record<string, string>;
 }
 
 const TodoItem: React.FC<TodoItemProps> = ({
@@ -72,6 +70,8 @@ const TodoItem: React.FC<TodoItemProps> = ({
   projectColor,
   tagColors,
 }) => {
+  if (!todo) return null;
+  const initialTodo = todo || { tags: [] };
   const { 
     id = uuidv4(), 
     title = 'New Task', 
@@ -81,9 +81,11 @@ const TodoItem: React.FC<TodoItemProps> = ({
     completed = false, 
     icon = null, 
     tags = [] 
-  } = todo || {};
+  } = initialTodo;
+  
+  // Initialize local edit state.
+  const [editTodo, setEditTodo] = useState(initialTodo);
 
-  const [editTodo, setEditTodo] = useState({ ...todo, id });
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isEditingProject, setIsEditingProject] = useState(false);
@@ -240,7 +242,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
               />
             ) : (
               <span
-                className={`text-lg inline-block ${!projectColor ? 'text-b-white-100' : ''}`}
+                className="text-lg inline-block"
                 style={{ color: projectColor || undefined }}
                 onDoubleClick={handleTitleDoubleClick}
               >
@@ -288,7 +290,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   className="text-sm text-b-black-600 bg-transparent"
                   autoFocus
                 >
-                  <option value="Unassigned" className="text-b-white-100">Unassigned</option>
+                  <option value="Unassigned">Unassigned</option>
                   {projects.map((proj: any, index: number) => (
                     <option key={index} value={proj.name}>
                       {proj.name}
@@ -304,7 +306,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
           </div>
 
           <div className="flex items-center">
-            {editTodo.tags.map((tag: string, index: number) =>
+            {(editTodo.tags || []).map((tag: string, index: number) =>
               editingTagIndex === index ? (
                 <CustomInput
                   key={index}

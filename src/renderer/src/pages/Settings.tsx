@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
+import { createRandomTodo } from '@renderer/utils/createRandomTodo';
+import { useTasks } from '../context/TaskContext'; // import hook to access tasks methods
 
 function Settings() {
   const [userName, setUserName] = useState(localStorage.getItem('userName') || 'Makai');
   const [chatGPTKey, setChatGPTKey] = useState(localStorage.getItem('chatGPTKey') || '');
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
-
+  
+  // Get addTask from the TaskContext
+  const { addTask } = useTasks();
+  
   const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserName(e.target.value);
     localStorage.setItem('userName', e.target.value);
@@ -15,11 +20,10 @@ function Settings() {
     localStorage.setItem('chatGPTKey', e.target.value);
   };
 
+  const activeProjects = ["Marketing", "Development", "Sales"];
+
   const verifyChatGPTKey = async () => {
-    // Your actual verification code would go here.
-    // For now, we simulate a successful verification if the key is non-empty.
     if (chatGPTKey.trim()) {
-      // Simulate a delay for verifying the API key
       setVerificationStatus('Verifying...');
       setTimeout(() => {
         setVerificationStatus('ChatGPT API key verified successfully.');
@@ -29,6 +33,25 @@ function Settings() {
       setVerificationStatus('Invalid API key.');
       alert('Invalid API key.');
     }
+  };
+
+  const handleClearTasks = () => {
+    localStorage.removeItem('todos'); // adjust key if needed
+    alert('All tasks have been cleared.');
+  };
+
+  const handleClearEvents = () => {
+    localStorage.removeItem('events');
+    window.dispatchEvent(new Event('eventsCleared'));
+    alert('All events have been cleared.');
+  };
+
+  const handleCreateRandomTodo = () => {
+    const randomTodos = Array.from({ length: 10 }, () => createRandomTodo(activeProjects));
+    randomTodos.forEach(newTodo => {
+      addTask(newTodo);
+    });
+    alert('10 random todos created!');
   };
 
   return (
@@ -62,6 +85,27 @@ function Settings() {
         {verificationStatus && (
           <p className="mt-2 text-sm text-green-600">{verificationStatus}</p>
         )}
+      </div>
+      <div className="flex flex-col space-y-2">
+        <button 
+          onClick={handleClearTasks} 
+          className="p-2 bg-red-500 text-white rounded-md"
+        >
+          Clear All Tasks
+        </button>
+        <button 
+          onClick={handleClearEvents} 
+          className="p-2 bg-red-500 text-white rounded-md"
+        >
+          Clear All Events
+        </button>
+        {/* New button to create a random todo */}
+        <button 
+          onClick={handleCreateRandomTodo}
+          className="p-2 bg-green-500 text-white rounded-md"
+        >
+          Create Random Todo
+        </button>
       </div>
     </div>
   );

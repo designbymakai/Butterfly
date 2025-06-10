@@ -8,6 +8,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
+import moment from 'moment';
 
 interface CompactTodoItemProps {
   title: string;
@@ -47,7 +48,8 @@ const CompactTodoItem: React.FC<CompactTodoItemProps> = ({
       className="flex items-center p-2 my-2 rounded shadow bg-b-black-300 hover:bg-b-black-400 cursor-pointer transition-all duration-200"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      style={{ borderLeft: `4px solid ${projectColor}`, backgroundColor: projectColor }}
+      // Use the project's color for a left border only.
+      style={{ borderLeft: `4px solid ${projectColor}` }}
     >
       {selectedIcon ? (
         <FontAwesomeIcon
@@ -64,14 +66,17 @@ const CompactTodoItem: React.FC<CompactTodoItemProps> = ({
       )}
       <div className="flex-grow">
         <div className="flex flex-row justify-between">
-          <div className="text-b-white-300">{title}</div>
+          {/* Title text now uses the project's color */}
+          <div className="text-b-white-300" style={{ color: projectColor }}>
+            {title}
+          </div>
           <div className="text-sm text-b-white-600 text-right pr-4">
             #{tags.join(', #')}
           </div>
         </div>
       </div>
       <div className="flex space-x-2">
-        <Tippy content={dueDate}>
+        <Tippy content={moment(dueDate).format('MM/DD/YY')}>
           <FontAwesomeIcon
             className="text-b-white-600"
             icon={faCalendarAlt}

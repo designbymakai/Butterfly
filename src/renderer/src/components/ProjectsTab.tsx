@@ -5,13 +5,14 @@ import MdEditor from 'react-markdown-editor-lite';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { adjustLightness } from '../utils/colorUtils';
-import { getProjectColor as getProjectColorFromList } from '../utils/projectColors';
+import { getProjectColorByIndex, getProjectColorForName } from '../utils/projectColors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical, faShapes } from '@fortawesome/free-solid-svg-icons';
 import ColorPickerModal from './ColorPickerModal';
 import CompactTodoItem from './CompactTodoItem';
 import '../assets/markdown.css'; // Custom styles for ProjectsTab
 import 'react-markdown-editor-lite/lib/index.css';
+
 
 const mdParser = new MarkdownIt({ html: true, linkify: true, typographer: true });
 
@@ -149,16 +150,9 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
 
   const projectTodos = todos.filter((todo) => todo.project === selectedProject);
   const selectedProjectColor =
-    projects.find((project) => project.name === selectedProject) &&
-    getProjectColorFromList({
-      mode: 'order',
-      index: projects.findIndex(p => p.name === selectedProject),
-    })
-      ? getProjectColorFromList({
-          mode: 'order',
-          index: projects.findIndex(p => p.name === selectedProject),
-        })
-      : 'inherit';
+  projects.find((project) => project.name === selectedProject)
+    ? getProjectColorByIndex(projects.findIndex(p => p.name === selectedProject))
+    : 'inherit';
 
   useEffect(() => {
     console.log('Projects received:', projects);
@@ -198,12 +192,13 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {projects.map((project, index) => {
-              const color = getProjectColorFromList({ mode: 'order', index });
+              const color = project.color ? project.color : getProjectColorForName(project.name, projects);
               return (
                 <div
                   key={index}
                   className="relative rounded-lg shadow-lg cursor-pointer"
                   onClick={() => handleProjectSelect(project)}
+                  style={{ backgroundColor: color }}
                 >
                   {/* Top Section (Header) with project background */}
                   <div style={{ backgroundColor: color }} className="px-4 py-2 relative rounded-t-lg">
@@ -333,12 +328,11 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
         <ColorPickerModal
           isOpen={true}
           onRequestClose={() => setColorPickerProjectIndex(null)}
-          currentColor={getProjectColorFromList({ mode: 'order', index: colorPickerProjectIndex })}
+          currentColor={projects[colorPickerProjectIndex!].color || getProjectColorForName(projects[colorPickerProjectIndex!].name, projects)}
           onColorChange={(newColor) => {
             const updatedProjects = [...projects];
-            updatedProjects[colorPickerProjectIndex] = {
-              ...updatedProjects[colorPickerProjectIndex],
-              // update the project color if you're storing it in the project object
+            updatedProjects[colorPickerProjectIndex!] = {
+              ...updatedProjects[colorPickerProjectIndex!],
               color: newColor,
             };
             setProjects(updatedProjects);

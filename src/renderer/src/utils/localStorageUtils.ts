@@ -20,3 +20,12 @@ export const loadTodosFromLocalStorage = () => {
   export const saveProjectsToLocalStorage = (projects) => {
     localStorage.setItem('projects', JSON.stringify(projects));
   };
+
+  export const loadEventsFromLocalStorage = () => {
+  const events = localStorage.getItem('events');
+  return events ? JSON.parse(events) : [];
+};
+
+export const saveEventsToLocalStorage = (events: any[]) => {
+  localStorage.setItem('events', JSON.stringify(events));
+};

@@ -3,6 +3,9 @@ import Chat from "../components/Chat";
 import MiniCalendar from "../components/MiniCalendar";
 import CompactTodoItem from '../components/CompactTodoItem';
 import Clock from '../components/Clock';
+import { useTasks } from '../context/TaskContext';
+import moment from 'moment';
+
 
 interface HomeProps {
   onNavigate: (destination: string) => void;
@@ -46,6 +49,8 @@ const loadEventsFromLocalStorage = () => {
 
 function Home({ onNavigate }: HomeProps) {
   const [timeOfDay] = useState(getTimeOfDay());
+  const { tasks } = useTasks();
+  const [selectedDay, setSelectedDay] = useState(new Date());
   const [todos] = useState(loadTodosFromLocalStorage());
   const [events] = useState(loadEventsFromLocalStorage());
   
@@ -55,33 +60,30 @@ function Home({ onNavigate }: HomeProps) {
     return todos.filter(todo => !todo.completed).length;
   };
 
-  const getTasksDueToday = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-  
-    return todos.filter(todo => {
-      if (!todo.dueDate) return false;
-      const dueDate = new Date(todo.dueDate);
-      return dueDate >= today && dueDate < tomorrow;
+  // Use selectedDay instead of today for agenda filtering:
+  const getTasksForSelectedDay = () => {
+    return tasks.filter(todo => {
+      const dueStr = todo.dueDate || todo.date;
+      if (!dueStr) return false;
+      const dueDate = new Date(dueStr);
+      return moment(dueDate).format('YYYY-MM-DD') === moment(selectedDay).format('YYYY-MM-DD');
     });
   };
 
-  const getEventsToday = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+  const getEventsForSelectedDay = () => {
+    const dayStart = new Date(selectedDay);
+    dayStart.setHours(0,0,0,0);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
     return events.filter(event => {
       const eventStart = new Date(event.start);
-      return eventStart >= today && eventStart < tomorrow;
+      return eventStart >= dayStart && eventStart < dayEnd;
     });
   };
 
-  const tasksDueToday = getTasksDueToday();
-  const eventsToday = getEventsToday();
-  const activeTasks = getActiveTasks();
+  const tasksForSelectedDay = getTasksForSelectedDay();
+  const eventsForSelectedDay = getEventsForSelectedDay();
+  const activeTasks = todos.filter(todo => !todo.completed).length;
 
   return (
     <div className="flex flex-col h-full w-full p-8 justify-between">
@@ -93,54 +95,52 @@ function Home({ onNavigate }: HomeProps) {
               Good {timeOfDay}, <span className='text-b-blue-300'>{storedName}</span>
             </p>
             <p className="text-b-white-400 rounded-2xl w-fit py-1 px-2 mt-2">
-              You have <span className='text-b-green-300'>{activeTasks}</span> active tasks, <span className='text-b-orange-300'>{tasksDueToday.length}</span> due today.
+              You have <span className='text-b-green-300'>{activeTasks}</span> active tasks, <span className='text-b-orange-300'></span> due today.
             </p>
           </div>
         </div>
         {/* Agenda Card */}
-        <div className="flex flex-col w-3/4 rounded-lg mx-4 p-4 overflow-y-auto no-scrollbar">
-          <div className="rounded-lg w-full">
-            {tasksDueToday.length > 0 ? (
-              tasksDueToday.map((todo, index) => (
-                <CompactTodoItem
-                  key={index}
-                  title={todo.title}
-                  description={todo.description}
-                  project={todo.project}
-                  dueDate={todo.dueDate}
-                  tags={todo.tags}
-                  completed={todo.completed}
-                  onToggle={() => {}}
-                  onSave={() => {}}
-                  selectedIcon={todo.icon}
-                  projectColor={todo.projectColor}
-                  onNavigate={(destination) => {
-                    // This will trigger setActiveComponent in App
-                    onNavigate(destination);
-                  }}
-                />
-              ))
-            ) : (
-              <p className="text-b-white-500 text-center">No tasks due today.</p>
-            )}
-            {eventsToday.length > 0 ? (
-              eventsToday.map((event, index) => (
-                <div key={index} className="p-2 my-2 rounded shadow bg-b-black-300 hover:bg-b-black-400">
-                  <div className='flex flex-row justify-between'>
-                    <p className="text-b-white-300 font-bold" style={{ color: event.color }}>{event.title}</p>
-                    <p className="text-b-white-600 ">
-                      {new Date(event.start).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} - {new Date(event.end).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                  <p className="text-b-white-100">{event.description}</p>
+        <div className="w-2/3 flex flex-col">
+          {tasksForSelectedDay.length > 0 ? (
+            tasksForSelectedDay.map((todo, index) => (
+              <CompactTodoItem
+                key={index}
+                title={todo.title}
+                description={todo.description}
+                project={todo.project}
+                dueDate={todo.dueDate}
+                tags={todo.tags}
+                completed={todo.completed}
+                onToggle={() => {}}
+                onSave={() => {}}
+                selectedIcon={todo.icon}
+                projectColor={todo.projectColor}
+                onNavigate={(destination) => onNavigate(destination)}
+              />
+            ))
+          ) : (
+            <p className="text-b-white-500 text-center">No tasks for this day.</p>
+          )}
+          {eventsForSelectedDay.length > 0 ? (
+            eventsForSelectedDay.map((event, index) => (
+              <div key={index} className="p-2 my-2 rounded shadow bg-b-black-300 hover:bg-b-black-400">
+                <div className="flex flex-row justify-between">
+                  <p className="text-b-white-300 font-bold" style={{ color: event.color }}>
+                    {event.title}
+                  </p>
+                  <p className="text-b-white-600 ">
+                    {new Date(event.start).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} - {new Date(event.end).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                  </p>
                 </div>
-              ))
-            ) : (
-              <p className="text-b-white-500 text-center">No events today.</p>
-            )}
-          </div>
+                <p className="text-b-white-100">{event.description}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-b-white-500 text-center">No events for this day.</p>
+          )}
         </div>
       </div>
+      
       {/* Middle Cards */}
       <div className="flex flex-row h-4/6 w-full pt-4 justify-between">
         <div className="flex w-3/5 h-full pr-10 rounded-lg m-auto">
@@ -149,7 +149,7 @@ function Home({ onNavigate }: HomeProps) {
           </div>
         </div>
         <div className="flex flex-col w-2/5 h-full rounded-lg m-auto">
-          <MiniCalendar />
+          <MiniCalendar onSelectDate={(date) => setSelectedDay(date)} />
         </div>
       </div>
     </div>

@@ -263,3 +263,27 @@ button.rbc-button-link.rbc-show-more:hover  {
   border: none !important;
 
 }
+
+.rbc-task-event {
+  /* Remove bubble background and position tasks at the top */
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.rbc-task-event-content {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.rbc-task-dot {
+  flex-shrink: 0;
+}
+
+.rbc-task-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

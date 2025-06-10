@@ -55,7 +55,6 @@ function createWindow(): void {
 }
 
 ipcMain.handle('fetch-openai-response', async (_, input, userApiKey?) => {
-  // If a personal API key is provided and non-empty, use it.
   if (userApiKey && userApiKey.trim()) {
     const projectKey = userApiKey.trim();
     const additionalHeaders: Record<string, string> = {};
@@ -63,74 +62,160 @@ ipcMain.handle('fetch-openai-response', async (_, input, userApiKey?) => {
       additionalHeaders['OpenAI-Project'] = process.env.OPENAI_PROJECT_ID || '';
     }
     try {
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
+      const payload = {
+        model: "gpt-3.5-turbo-0613",
+        messages: [
+          { role: "system", content: "You are Butterfly, a productivity assistant." },
+          { role: "user", content: finalPrompt }
+        ],
+        functions: [
+          {
+            name: "listTasks",
+            description: "Lists all active tasks",
+            parameters: { type: "object", properties: {} }
+          },
+          {
+            name: "createTask",
+            description: "Creates a new task. Provide task name, due date, project, and a list of tags. The task will be assigned a UUID automatically.",
+            parameters: {
+              type: "object",
+              properties: {
+                title: { type: "string", description: "The title of the task" },
+                dueDate: { type: "string", format: "date-time", description: "Due date/time" },
+                project: { type: "string", description: "Project name" },
+                tags: { type: "array", items: { type: "string" }, description: "List of tags" }
+              },
+              required: ["title", "dueDate", "project", "tags"]
+            }
+          },
+          {
+            name: "updateTask",
+            description: "Updates an active task's metadata. Provide the task UUID and any fields to update.",
+            parameters: {
+              type: "object",
+              properties: {
+                id: { type: "string", description: "The UUID of the task" },
+                title: { type: "string", description: "New title (if updating)" },
+                dueDate: { type: "string", format: "date-time", description: "New due date (if updating)" },
+                project: { type: "string", description: "New project (if updating)" },
+                tags: { type: "array", items: { type: "string" }, description: "Updated list of tags (if updating)" }
+              },
+              required: ["id"]
+            }
+          },
+          {
+            name: "getTaskDetails",
+            description: "Retrieves full metadata for a specific task",
+            parameters: {
+              type: "object",
+              properties: { id: { type: "string", description: "The UUID of the task" } },
+              required: ["id"]
+            }
+          },
+          {
+            name: "createEvent",
+            description: "Creates a new event. Provide event title, start time, end time, and an optional description.",
+            parameters: {
+              type: "object",
+              properties: {
+                title: { type: "string", description: "The title of the event" },
+                start: { type: "string", format: "date-time", description: "Event start time" },
+                end: { type: "string", format: "date-time", description: "Event end time" },
+                description: { type: "string", description: "Optional event description" }
+              },
+              required: ["title", "start", "end"]
+            }
+          },
+          {
+            name: "updateEvent",
+            description: "Updates an event's details. Provide an event ID and fields to update.",
+            parameters: {
+              type: "object",
+              properties: {
+                id: { type: "string", description: "The event ID" },
+                title: { type: "string", description: "New title (if updating)" },
+                start: { type: "string", format: "date-time", description: "New start time (if updating)" },
+                end: { type: "string", format: "date-time", description: "New end time (if updating)" },
+                description: { type: "string", description: "New description (if updating)" }
+              },
+              required: ["id"]
+            }
+          },
+          {
+            name: "getEventDetails",
+            description: "Retrieves details for a specific event",
+            parameters: {
+              type: "object",
+              properties: { id: { type: "string", description: "The event ID" } },
+              required: ["id"]
+            }
+          }
+        ]
+      };
+      
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${projectKey}`,
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${projectKey}`,
           ...additionalHeaders
         },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            { role: 'system', content: 'Butterfly is a helpful productivity assistant' },
-            {
-              role: 'user',
-              content: 'I have to finish a project report today, but I don’t know where to start.'
-            },
-            {
-              role: 'system',
-              content:
-                'Let’s break it down. First, start by outlining the sections of the report. Once the outline is ready, move on to filling in the details for the introduction. After that, focus on one section at a time, starting with the easiest. I’ll help keep track of your progress and remind you to take breaks. Does that sound good?'
-            },
-            { role: 'user', content: 'What tasks do I have due today?' },
-            {
-              role: 'system',
-              content:
-                'You have one task due today! {"UUID" : "0c389dd1f-9341-4c49-a186-495b4b287b72"}'
-            },
-            { role: 'user', content: 'What tasks do I have due this week?' },
-            {
-              role: 'system',
-              content:
-                'You have a few tasks due this week: Task 1: {"UUID": "4a84d6d8-6cc0-4d1e-aedf-5405655a0f3a"}, Task 2: {"UUID": "293d7549-e611-468b-9df5-61d7afff54ca"}  If you need more details on any task, just let me know! Remember to take one step at a time, and you’re doing great!'
-            },
-            { role: 'user', content: 'Create task: create mockup logo for startup' },
-            {
-              role: 'system',
-              content:
-                'A task has been created: {"id": "placeholder-id", "title": "Create Mockup Logo for Startup", "description": "Design a mockup logo for the startup project. Make sure to explore different variations and concepts.", "dueDate": "2024-09-16T12:00:00.000Z", "tags": ["design", "branding", "logo"], "completed": false}'
-            },
-            { role: 'user', content: input }
-          ],
-          temperature: 0.7
-        })
-      })
-      console.log("Request body:", JSON.stringify({
-          messages: [
-            { role: 'system', content: 'Butterfly is a helpful productivity assistant' },
-            // ... other messages ...
-            { role: 'user', content: input }
-          ],
-          temperature: 0.7
-        }));
-      const rawText = await res.text();
-      console.log("Raw response from backend (first 500 chars):", rawText.slice(0, 500));     
-      try {
-        data = JSON.parse(rawText);
-      } catch (e) {
-        throw new Error('Server did not return JSON: ' + rawText);
-      }
-      if (data.choices && data.choices.length > 0) {
-        return data.choices[0].message.content.trim();
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await res.json();
+          
+          // Step 2: Check if a function call was returned.
+      if (data.choices[0].finish_reason === "function_call") {
+        const functionCall = data.choices[0].message.function_call;
+        const { name, arguments: args } = functionCall;
+        console.log("Function call received:", name, args);
+            
+        // Validate allowed functions.
+        const allowedFunctions = ["listTasks", "createTask", "updateTask", "getTaskDetails", "createEvent", "updateEvent", "getEventDetails"];
+        if (!allowedFunctions.includes(name)) {
+          throw new Error("Unrecognized function call: " + name);
+        }
+            
+        // Route to the corresponding local function and return a clear JSON string.
+        if (name === "listTasks") {
+          const tasks = loadTodosFromLocalStorage();
+          return JSON.stringify({ tasks });
+        } else if (name === "createTask") {
+          const parsedArgs = JSON.parse(args);
+          parsedArgs.id = parsedArgs.id === "placeholder-id" ? uuidv4() : parsedArgs.id;
+          createTask(parsedArgs);
+          return JSON.stringify({ message: "Task created." });
+        } else if (name === "updateTask") {
+          const parsedArgs = JSON.parse(args);
+          updateTask(parsedArgs);
+          return JSON.stringify({ message: "Task updated." });
+        } else if (name === "getTaskDetails") {
+          const parsedArgs = JSON.parse(args);
+          const task = getTaskDetails(parsedArgs.id);
+          return JSON.stringify({ task });
+        } else if (name === "createEvent") {
+          const parsedArgs = JSON.parse(args);
+          createEvent(parsedArgs);
+          return JSON.stringify({ message: "Event created." });
+        } else if (name === "updateEvent") {
+          const parsedArgs = JSON.parse(args);
+          updateEvent(parsedArgs);
+          return JSON.stringify({ message: "Event updated." });
+        } else if (name === "getEventDetails") {
+          const parsedArgs = JSON.parse(args);
+          const eventDetails = getEventDetails(parsedArgs.id);
+          return JSON.stringify({ eventDetails });
+        }
       } else {
-        throw new Error('No response from OpenAI Assistant');
+        // Regular assistant response
+        return data.choices[0].message.content.trim();
       }
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Error fetching response from OpenAI Assistant: ${error.message}`);
       } else {
-        throw new Error('Unknown error occurred');
+        throw new Error("Unknown error occurred");
       }
     }
   } else {
@@ -147,33 +232,7 @@ ipcMain.handle('fetch-openai-response', async (_, input, userApiKey?) => {
         body: JSON.stringify({
           messages: [
             { role: 'system', content: 'Butterfly is a helpful productivity assistant' },
-            {
-              role: 'user',
-              content: 'I have to finish a project report today, but I don’t know where to start.'
-            },
-            {
-              role: 'system',
-              content:
-                'Let’s break it down. First, start by outlining the sections of the report. Once the outline is ready, move on to filling in the details for the introduction. After that, focus on one section at a time, starting with the easiest. I’ll help keep track of your progress and remind you to take breaks. Does that sound good?'
-            },
-            { role: 'user', content: 'What tasks do I have due today?' },
-            {
-              role: 'system',
-              content:
-                'You have one task due today! {"UUID" : "0c389dd1f-9341-4c49-a186-495b4b287b72"}'
-            },
-            { role: 'user', content: 'What tasks do I have due this week?' },
-            {
-              role: 'system',
-              content:
-                'You have a few tasks due this week: Task 1: {"UUID": "4a84d6d8-6cc0-4d1e-aedf-5405655a0f3a"}, Task 2: {"UUID": "293d7549-e611-468b-9df5-61d7afff54ca"}  If you need more details on any task, just let me know! Remember to take one step at a time, and you’re doing great!'
-            },
-            { role: 'user', content: 'Create task: create mockup logo for startup' },
-            {
-              role: 'system',
-              content:
-                'A task has been created: {"id": "placeholder-id", "title": "Create Mockup Logo for Startup", "description": "Design a mockup logo for the startup project. Make sure to explore different variations and concepts.", "dueDate": "2024-09-16T12:00:00.000Z", "tags": ["design", "branding", "logo"], "completed": false}'
-            },
+            // ... other messages ...
             { role: 'user', content: input }
           ],
           temperature: 0.7
