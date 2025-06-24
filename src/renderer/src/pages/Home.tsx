@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import Chat from "../components/Chat";
 import MiniCalendar from "../components/MiniCalendar";
 import CompactTodoItem from '../components/CompactTodoItem';
-import Clock from '../components/Clock';
+import SmartSuggestionCard from '../components/SmartSuggestionCard';
+import DashboardCard from '../components/DashboardCard';
 import { useTasks } from '../context/TaskContext';
 import moment from 'moment';
+
 
 
 interface HomeProps {
@@ -88,19 +90,30 @@ function Home({ onNavigate }: HomeProps) {
   return (
     <div className="flex flex-col h-full w-full p-8 justify-between">
       <div className="flex flex-row h-2/6 w-full justify-between">
-        {/* Welcome Card */}
-        <div className="flex flex-col w-1/4 h-full rounded-lg mx-4 justify-between">
-          <div className="rounded-lg align-top">
-            <p className="text-b-white-100 text-2xl">
-              Good {timeOfDay}, <span className='text-b-blue-300'>{storedName}</span>
-            </p>
-            <p className="text-b-white-400 rounded-2xl w-fit py-1 px-2 mt-2">
-              You have <span className='text-b-green-300'>{activeTasks}</span> active tasks, <span className='text-b-orange-300'></span> due today.
-            </p>
-          </div>
+        {/* Replace Welcome Card with Smart Suggestion Card */}
+        <div className="flex flex-col w-1/4 h-full mx-4">
+          <SmartSuggestionCard
+            tasks={todos}
+            events={events}
+            onSuggestionClick={(suggestion) => {
+              // When a suggestion is clicked,
+              // you can trigger the chat UI to expand on this suggestion.
+              // For example, pre-fill the chat input or push a follow-up message.
+              alert(`Suggestion triggered: ${suggestion}\nHey Makai, would you like me to help with that?`);
+            }}
+          />
+        </div>
+        {/* Dashboard Card */}
+        <div className="flex flex-col w-1/4 h-full mx-4">
+          <DashboardCard 
+            todos={todos}
+            tasks={tasks}
+            onFocusSession={() => { alert("Focus Session triggered!"); }}
+            onJumpToProject={() => { alert("Jump to Recent Projects triggered!"); }}
+          />
         </div>
         {/* Agenda Card */}
-        <div className="w-2/3 flex flex-col">
+        <div className="w-2/4 flex flex-col ml-4">
           {tasksForSelectedDay.length > 0 ? (
             tasksForSelectedDay.map((todo, index) => (
               <CompactTodoItem

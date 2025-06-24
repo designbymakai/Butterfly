@@ -16,7 +16,15 @@ import {
   faComputer, 
   faBuilding, 
   faPlus, 
-  faProjectDiagram
+  faProjectDiagram,
+  faCircleChevronDown,
+  faCircleChevronRight,
+  faCircleChevronUp,
+  faStop,
+  faSpinner,
+  faHourglassHalf,
+  faMagnifyingGlassChart,
+  faFlagCheckered
 } from '@fortawesome/free-solid-svg-icons';
 import { v4 as uuidv4 } from 'uuid';
 import DatePicker from 'react-datepicker';
@@ -80,12 +88,13 @@ const TodoItem: React.FC<TodoItemProps> = ({
     dueDate, 
     completed = false, 
     icon = null, 
-    tags = [] 
+    tags = [],
+    progress = 'Not Started',    // New field with a default
+    priority = 'Medium'          // New field with a default
   } = initialTodo;
   
-  // Initialize local edit state.
+  // Local state for editing the todo object.
   const [editTodo, setEditTodo] = useState(initialTodo);
-
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isEditingProject, setIsEditingProject] = useState(false);
@@ -101,6 +110,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
   const dueDateRef = useRef<DatePicker | null>(null);
   const tagsRef = useRef<HTMLInputElement | null>(null);
 
+  // Existing handlers for title, description, project, date, and tags...
   const handleTitleDoubleClick = () => setIsEditingTitle(true);
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditTodo({ ...editTodo, title: e.target.value });
@@ -163,6 +173,22 @@ const TodoItem: React.FC<TodoItemProps> = ({
     onSave(editTodo);
   };
 
+  // New handlers for progress.
+  const handleProgressChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const updatedTodo = { ...editTodo, progress: e.target.value };
+    setEditTodo(updatedTodo);
+    onUpdate(updatedTodo);
+    onSave(updatedTodo);
+  };
+
+  // New handlers for priority.
+  const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const updatedTodo = { ...editTodo, priority: e.target.value };
+    setEditTodo(updatedTodo);
+    onUpdate(updatedTodo);
+    onSave(updatedTodo);
+  };
+
   const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => setNewTag(e.target.value);
   const handleTagKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && newTag.trim() !== '') {
@@ -203,6 +229,59 @@ const TodoItem: React.FC<TodoItemProps> = ({
     const updatedTodo = { ...editTodo, tags: updatedTags };
     setEditTodo(updatedTodo);
     setEditingTagIndex(null);
+    onUpdate(updatedTodo);
+    onSave(updatedTodo);
+  };
+
+  const progressOptions = ["Not Started", "In Progress", "Waiting", "Needs Review", "Completed"];
+  const priorityOptions = ["Low", "Medium", "High"];
+
+  const getProgressIcon = (progress: string) => {
+    switch (progress) {
+      case "Not Started":
+        return faStop;
+      case "In Progress":
+        return faSpinner;
+      case "Waiting":
+        return faHourglassHalf;
+      case "Needs Review":
+        return faMagnifyingGlassChart;
+      case "Completed":
+        return faFlagCheckered;
+      default:
+        return faStop;
+    }
+  };
+
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
+      case "Low":
+        return faCircleChevronDown;
+      case "Medium":
+        return faCircleChevronRight;
+      case "High":
+        return faCircleChevronUp;
+      default:
+        return faCircleChevronRight;
+    }
+  };
+
+  const handleProgressCycle = () => {
+    const currentIndex = progressOptions.indexOf(editTodo.progress);
+    const nextIndex = (currentIndex + 1) % progressOptions.length;
+    const newProgress = progressOptions[nextIndex];
+    const updatedTodo = { ...editTodo, progress: newProgress };
+    setEditTodo(updatedTodo);
+    onUpdate(updatedTodo);
+    onSave(updatedTodo);
+  };
+
+  const handlePriorityCycle = () => {
+    const currentIndex = priorityOptions.indexOf(editTodo.priority);
+    const nextIndex = (currentIndex + 1) % priorityOptions.length;
+    const newPriority = priorityOptions[nextIndex];
+    const updatedTodo = { ...editTodo, priority: newPriority };
+    setEditTodo(updatedTodo);
     onUpdate(updatedTodo);
     onSave(updatedTodo);
   };
@@ -250,10 +329,29 @@ const TodoItem: React.FC<TodoItemProps> = ({
               </span>
             )}
 
+            {/* Clickable progress icon with plain text */}
+            <span onClick={handleProgressCycle} className="ml-2 cursor-pointer flex items-center">
+              <FontAwesomeIcon
+                icon={getProgressIcon(editTodo.progress)}
+                className="text-b-black-500"
+              />
+              <span className="ml-1 text-sm text-b-black-600">{editTodo.progress}</span>
+            </span>
+
+            {/* Clickable priority icon with plain text */}
+            <span onClick={handlePriorityCycle} className="ml-2 cursor-pointer flex items-center">
+              <FontAwesomeIcon
+                icon={getPriorityIcon(editTodo.priority)}
+                className="text-b-black-500"
+              />
+              <span className="ml-1 text-sm text-b-black-600">{editTodo.priority}</span>
+            </span>
+
+            {/* Existing inline items for date and project remain here */}
             <div className="flex items-center px-1">
               <FontAwesomeIcon
                 icon={faCalendarAlt}
-                className="text-b-black-600 text-sm cursor-pointer pr-1"
+                className="text-b-black-500 text-sm cursor-pointer pr-1"
                 onClick={handleDateIconClick}
               />
               {isEditingDueDate ? (
@@ -263,7 +361,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   onChange={handleDateChange}
                   onBlur={handleDateBlur}
                   customInput={<CustomInput />}
-                  className="text-sm text-b-black-600 bg-transparent"
+                  className="text-sm text-b-black-500 bg-transparent"
                   autoFocus
                 />
               ) : (
@@ -274,11 +372,10 @@ const TodoItem: React.FC<TodoItemProps> = ({
                 </span>
               )}
             </div>
-
             <div className="flex items-center px-1">
               <FontAwesomeIcon
                 icon={faProjectDiagram}
-                className="text-b-black-600 text-sm cursor-pointer pr-1"
+                className="text-b-black-500 text-sm cursor-pointer pr-1"
                 onClick={handleProjectIconClick}
               />
               {isEditingProject ? (
@@ -304,7 +401,6 @@ const TodoItem: React.FC<TodoItemProps> = ({
               )}
             </div>
           </div>
-
           <div className="flex items-center">
             {(editTodo.tags || []).map((tag: string, index: number) =>
               editingTagIndex === index ? (
@@ -349,7 +445,6 @@ const TodoItem: React.FC<TodoItemProps> = ({
             )}
           </div>
         </div>
-
         {isEditingDescription ? (
           <CustomInput
             ref={descriptionRef}

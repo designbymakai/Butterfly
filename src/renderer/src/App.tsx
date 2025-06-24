@@ -1,35 +1,41 @@
-import './assets/main.css';
+import './assets/main.css'
 
-import Home from './pages/Home';
-import Todo from './pages/Todo';
-import Projects from './pages/Projects';
-import Cal from './pages/Calendar';
-import Settings from './pages/Settings';
-import ErrorBoundary from './components/ErrrorBoundry';
-import { useState } from 'react';
-import { TaskProvider } from './context/TaskContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faClipboard, faProjectDiagram, faCalendar, faCog } from '@fortawesome/free-solid-svg-icons';
+import Home from './pages/Home'
+import Todo from './pages/Todo'
+import Projects from './pages/Projects'
+import Cal from './pages/Calendar'
+import Settings from './pages/Settings'
+import ErrorBoundary from './components/ErrorBoundry'
+import { useState } from 'react'
+import { TaskProvider } from './context/TaskContext'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faHome,
+  faClipboard,
+  faProjectDiagram,
+  faCalendar,
+  faCog
+} from '@fortawesome/free-solid-svg-icons'
 
-function App() {
-  const [activeComponent, setActiveComponent] = useState('Home');
+function App(): React.ReactElement {
+  const [activeComponent, setActiveComponent] = useState('Home')
 
-  const renderComponent = () => {
+  const renderComponent = (): React.ReactElement => {
     switch (activeComponent) {
       case 'Home':
-        return <Home onNavigate={(destination) => setActiveComponent(destination)} />;
+        return <Home onNavigate={(destination) => setActiveComponent(destination)} />
       case 'Todo':
-        return <Todo />;
+        return <Todo />
       case 'Projects':
-        return <Projects />;
+        return <Projects />
       case 'Cal':
-        return <Cal />;
+        return <Cal />
       case 'Settings':
-        return <Settings />;
+        return <Settings />
       default:
-        return <Home onNavigate={(destination) => setActiveComponent(destination)} />;
+        return <Home onNavigate={(destination) => setActiveComponent(destination)} />
     }
-  };
+  }
 
   return (
     <ErrorBoundary>
@@ -63,7 +69,10 @@ function App() {
                 onClick={() => setActiveComponent('Projects')}
                 style={{ maxHeight: '80px' }}
               >
-                <FontAwesomeIcon icon={faProjectDiagram} className="text-2xl transition duration-500" />
+                <FontAwesomeIcon
+                  icon={faProjectDiagram}
+                  className="text-2xl transition duration-500"
+                />
               </button>
               <button
                 className={`group py-4 px-4 rounded hover:bg-b-white-100 hover:text-b-green-300 transition hover:scale-110 ${
@@ -96,7 +105,7 @@ function App() {
         </div>
       </TaskProvider>
     </ErrorBoundary>
-  );
+  )
 }
 
-export default App;
+export default App

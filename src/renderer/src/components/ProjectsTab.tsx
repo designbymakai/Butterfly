@@ -4,21 +4,21 @@ import MarkdownIt from 'markdown-it';
 import MdEditor from 'react-markdown-editor-lite';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { adjustLightness } from '../utils/colorUtils';
 import { getProjectColorByIndex, getProjectColorForName } from '../utils/projectColors';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical, faShapes } from '@fortawesome/free-solid-svg-icons';
 import ColorPickerModal from './ColorPickerModal';
 import CompactTodoItem from './CompactTodoItem';
-import '../assets/markdown.css'; // Custom styles for ProjectsTab
+import '../assets/markdown.css';
 import 'react-markdown-editor-lite/lib/index.css';
-
+import { useTasks } from '../context/TaskContext';
 
 const mdParser = new MarkdownIt({ html: true, linkify: true, typographer: true });
 
 interface Project {
   name: string;
   description?: string;
+  color?: string;
 }
 
 interface Todo {
@@ -49,6 +49,7 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
   projects,
   setProjects,
 }) => {
+  const { tasks } = useTasks();
   const [selectedProject, setSelectedProject] = useState<'all' | string>('all');
   const [projectNotes, setProjectNotes] = useState<Record<string, string>>({});
   const [isEditingProjects, setIsEditingProjects] = useState(false);
@@ -69,7 +70,7 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
     });
   };
 
-  // Existing useEffects…
+  // Load saved project notes from local storage
   useEffect(() => {
     const savedNotes = localStorage.getItem('projectNotes');
     if (savedNotes) {
@@ -97,6 +98,7 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
     localStorage.setItem('projectNotes', JSON.stringify(projectNotes));
     setIsEditingNotes(false);
   };
+
   // Dropdown handlers:
   const handleRenameProject = (index: number) => {
     setEditingTitleIndex(index);
@@ -148,11 +150,20 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
     setEditingDescIndex(null);
   };
 
-  const projectTodos = todos.filter((todo) => todo.project === selectedProject);
+  // For the "all" projects view, get project-related tasks for each project.
+  // When a single project is selected, these todos will be shown in a separate projects view.
+  const projectTodosMap: Record<string, Todo[]> = {};
+  projects.forEach((project) => {
+    const normalizedProjectName = project.name.trim().toLowerCase();
+    projectTodosMap[project.name] = tasks.filter((todo) =>
+      todo.project.trim().toLowerCase() === normalizedProjectName
+    );
+    console.log(`Project "${project.name}" tasks:`, projectTodosMap[project.name]);
+  });
   const selectedProjectColor =
-  projects.find((project) => project.name === selectedProject)
-    ? getProjectColorByIndex(projects.findIndex(p => p.name === selectedProject))
-    : 'inherit';
+    projects.find((project) => project.name === selectedProject)
+      ? getProjectColorByIndex(projects.findIndex(p => p.name === selectedProject))
+      : 'inherit';
 
   useEffect(() => {
     console.log('Projects received:', projects);
@@ -192,7 +203,11 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {projects.map((project, index) => {
-              const color = project.color ? project.color : getProjectColorForName(project.name, projects);
+              const color = project.color
+                ? project.color
+                : getProjectColorForName(project.name, projects);
+              // Get tasks related to current project; fallback to empty array if none.
+              const projectTasks = projectTodosMap[project.name] || [];
               return (
                 <div
                   key={index}
@@ -201,7 +216,10 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
                   style={{ backgroundColor: color }}
                 >
                   {/* Top Section (Header) with project background */}
-                  <div style={{ backgroundColor: color }} className="px-4 py-2 relative rounded-t-lg">
+                  <div
+                    style={{ backgroundColor: color }}
+                    className="px-4 py-2 relative rounded-t-lg"
+                  >
                     <div className="flex justify-between items-center">
                       {editingTitleIndex === index ? (
                         <input
@@ -219,7 +237,9 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setOpenProjectOptions(openProjectOptions === index ? null : index);
+                          setOpenProjectOptions(
+                            openProjectOptions === index ? null : index
+                          );
                         }}
                         className="absolute right-4 text-white text-2xl"
                       >
@@ -259,20 +279,53 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
                       </div>
                     )}
                   </div>
-                  {/* Bottom Section (Body) with project description */}
-                  <div className="p-4 bg-b-black-100 text-white rounded-b-lg">
-                    {editingDescIndex === index ? (
-                      <input
-                        type="text"
-                        value={newDescription}
-                        onChange={(e) => setNewDescription(e.target.value)}
-                        onBlur={() => saveDescriptionEdit(index)}
-                        autoFocus
-                        className="bg-transparent border-b border-white w-full"
-                      />
-                    ) : (
-                      project.description || "No Description Provided."
-                    )}
+                  {/* Bottom Section (Body) with project description and related tasks */}
+                  <div className="p-4 bg-b-black-100 text-white rounded-b-lg h-64 flex flex-col">
+                    <div className="flex-none">
+                      {editingDescIndex === index ? (
+                        <input
+                          type="text"
+                          value={newDescription}
+                          onChange={(e) => setNewDescription(e.target.value)}
+                          onBlur={() => saveDescriptionEdit(index)}
+                          autoFocus
+                          className="bg-transparent border-b border-white w-full"
+                        />
+                      ) : (
+                        <>
+                          <p className="truncate">
+                            {project.description || "No Description Provided."}
+                          </p>
+                          {projectTasks.length > 0 && (
+                            <h4 className="text-sm font-bold mt-2">Tasks:</h4>
+                          )}
+                        </>
+                      )}
+                    </div>
+                    <div className="mt-2 flex-grow overflow-y-auto">
+                      {projectTasks.length > 0 && (
+                        <div className="space-y-2">
+                          {projectTasks.map((task) => (
+                            <CompactTodoItem
+                              key={task.id}
+                              title={task.title}
+                              description={task.description}
+                              project={project.name}
+                              dueDate={
+                                task.date ? new Date(task.date).toString() : ""
+                              }
+                              tags={task.tags}
+                              completed={task.completed}
+                              onToggle={() => {}}
+                              onSave={() => {}}
+                              selectedIcon={undefined}
+                              projectColor={color}
+                              onNavigate={() => handleProjectSelect(project)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -281,28 +334,51 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
         </div>
       ) : (
         <div>
-          <div className="flex flex-col mt-4">
-            {projectTodos.map((todo, index) => (
-              <CompactTodoItem
-                key={index}
-                title={todo.title}
-                description={todo.description}
-                project={todo.project}
-                dueDate={todo.date ? new Date(todo.date).toString() : ''}
-                tags={todo.tags}
-                completed={todo.completed}
-                onToggle={() => handleToggleTodo(index)}
-                onSave={() => {}}
-                projectColor={selectedProjectColor}
-                selectedIcon={undefined}
-              />
-            ))}
+          {/* Header with Project Title and Description at the top */}
+          <div className="mb-4 p-4 bg-b-black-300 text-white rounded">
+            <h2 className="text-2xl font-bold">{selectedProject}</h2>
+            {projects.find((p) => p.name === selectedProject) && (
+              <p className="mt-2">
+                {projects.find((p) => p.name === selectedProject)?.description ||
+                  "No Description Provided."}
+              </p>
+            )}
           </div>
+          {/* Section for task items beneath the header using tasks from context */}
+          <div className="p-4 text-white rounded-lg h-64 flex flex-col">
+            <div className="mt-2 flex-grow overflow-y-auto">
+              {tasks
+                .filter((task) =>
+                  task.project.trim().toLowerCase() === selectedProject.trim().toLowerCase()
+                )
+                .map((task, index) => (
+                  <CompactTodoItem
+                    key={task.id}
+                    title={task.title}
+                    description={task.description}
+                    project={task.project}
+                    dueDate={task.date ? new Date(task.date).toString() : ""}
+                    tags={task.tags}
+                    completed={task.completed}
+                    onToggle={() => handleToggleTodo(index)}
+                    onSave={() => {}}
+                    projectColor={selectedProjectColor}
+                    selectedIcon={undefined}
+                    onNavigate={() => {}}
+                  />
+                ))}
+            </div>
+          </div>
+          {/* Existing notes / markdown editor section if needed */}
           {isEditingNotes ? (
             <div>
               <MdEditor
-                value={projectNotes[selectedProject] || ''}
-                style={{ height: '300px', backgroundColor: 'transparent', border: 'none' }}
+                value={projectNotes[selectedProject] || ""}
+                style={{
+                  height: "300px",
+                  backgroundColor: "transparent",
+                  border: "none",
+                }}
                 renderHTML={(text) => mdParser.render(text)}
                 onChange={handleEditorChange}
                 view={{ menu: true, md: true, html: false }}
@@ -317,7 +393,7 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
           ) : (
             <div className="markdown-body">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {projectNotes[selectedProject] || ''}
+                {projectNotes[selectedProject] || ""}
               </ReactMarkdown>
             </div>
           )}
@@ -328,7 +404,13 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
         <ColorPickerModal
           isOpen={true}
           onRequestClose={() => setColorPickerProjectIndex(null)}
-          currentColor={projects[colorPickerProjectIndex!].color || getProjectColorForName(projects[colorPickerProjectIndex!].name, projects)}
+          currentColor={
+            projects[colorPickerProjectIndex!].color ||
+            getProjectColorForName(
+              projects[colorPickerProjectIndex!].name,
+              projects
+            )
+          }
           onColorChange={(newColor) => {
             const updatedProjects = [...projects];
             updatedProjects[colorPickerProjectIndex!] = {
