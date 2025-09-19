@@ -26,6 +26,10 @@
 
 The Butterfly homepage offers a clear, concise overview of your day so you can hit the ground running. It shows a thumbnail of your calendar events, a daily agenda with tasks and events, and a summary of active tasks (including those due today). The AI Assistant takes center stage for quick add/update/prioritize flows and guidance on what to focus on.
 
+Butterfly was designed with **accessibility in mind**, especially for adults in the workplace who are **neurodivergent and have ADHD**. By minimizing distractions and providing clear direction, it helps users reduce task paralysis and focus on what matters most.  
+
+This project was my **final-year capstone** for my Design degree at the **University of Auckland** and was featured in [**Design Assembly’s Hot New Things**](https://designassembly.org.nz/2025/08/01/2025-hot-new-things-makai-ingalls-university-of-auckland/).
+
 ### Key Features
 - **Daily Agenda** – Quick overview of tasks and events for the day  
 - **Calendar Snapshot** – At-a-glance events  
@@ -55,12 +59,3 @@ Create, edit, and rearrange events with simple interactions. Multiple views fit 
 | | | |
 |---|---|---|
 [<img src="https://github.com/user-attachments/assets/6c948d96-8328-4fec-a377-25bb1b37ca28" alt="New home hero" width="260">](https://github.com/user-attachments/assets/6c948d96-8328-4fec-a377-25bb1b37ca28) | [<img src="https://github.com/user-attachments/assets/bda6ad97-6a06-4d4c-b7ac-7425e5339386" alt="Calendar view" width="260">](https://github.com/user-attachments/assets/bda6ad97-6a06-4d4c-b7ac-7425e5339386) | [<img src="https://github.com/user-attachments/assets/1ef90fd3-2f0e-401d-bce4-1aaf921ca2d6" alt="Assistant view" width="260">](https://github.com/user-attachments/assets/1ef90fd3-2f0e-401d-bce4-1aaf921ca2d6) |
-
-
-
----
-
-## Accessibility & Media Notes
-- Every image includes **alt text**; keep it short and specific.  
-- Prefer **WebP** or optimized **PNG** for stills; for motion, use **short GIF/WebP** (≤10–15 MB).  
-- Thumbnails are just smaller `<img width="260">` links that open full size on click.
