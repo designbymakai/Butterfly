@@ -9,18 +9,15 @@
 > Latest UI improvements, refined agenda, and streamlined quick actions.
 
 <p align="center">
-  <!-- Feature hero (large, prominent) -->
   <img src="https://github.com/user-attachments/assets/358d6f7e-b0ab-4ce3-8545-c10eb5a64d10" alt="Butterfly new home hero" width="900">
 </p>
 
-
 <p align="center">
-  <!-- Add 2–3 more prominent images here at medium size -->
-  <img alt="" src="https://github.com/user-attachments/assets/bd857dcd-fbdd-4579-ac8f-b5460e1634b9" />
-  <img alt="" src="https://github.com/user-attachments/assets/b8ca27c6-bf1d-4bdb-b0fb-8440ff294fd6" />
-  <img alt="" src="https://github.com/user-attachments/assets/fdeffc7b-ece3-4473-9e06-5d12704eedc4" />
-  <img alt="" src="https://github.com/user-attachments/assets/9e8c477a-d9ae-4e62-a6da-b592c71d9d56" />
-  <img alt="" src="https://github.com/user-attachments/assets/24095e85-ebc1-4df5-bf55-1616859bca3a" />
+  <img src="https://github.com/user-attachments/assets/bd857dcd-fbdd-4579-ac8f-b5460e1634b9" alt="screenshot 1" width="250">
+  <img src="https://github.com/user-attachments/assets/b8ca27c6-bf1d-4bdb-b0fb-8440ff294fd6" alt="screenshot 2" width="250">
+  <img src="https://github.com/user-attachments/assets/fdeffc7b-ece3-4473-9e06-5d12704eedc4" alt="screenshot 3" width="250">
+  <img src="https://github.com/user-attachments/assets/9e8c477a-d9ae-4e62-a6da-b592c71d9d56" alt="screenshot 4" width="250">
+  <img src="https://github.com/user-attachments/assets/24095e85-ebc1-4df5-bf55-1616859bca3a" alt="screenshot 5" width="250">
 </p>
 
 ---
@@ -54,26 +51,12 @@ Create, edit, and rearrange events with simple interactions. Multiple views fit 
 
 ## Screenshot Gallery
 
-### Latest (click any thumbnail for full size)
-<!-- 3-across grid using a markdown table and <img> widths -->
+### Hero Shots (click any thumbnail for full size)
 | | | |
 |---|---|---|
-| [<img src="https://github.com/user-attachments/assets/6c948d96-8328-4fec-a377-25bb1b37ca28" alt="New home hero" width="260">](https://github.com/user-attachments/assets/6c948d96-8328-4fec-a377-25bb1b37ca28) | [<img src="https://github.com/user-attachments/assets/bda6ad97-6a06-4d4c-b7ac-7425e5339386" alt="Calendar view" width="260">](https://github.com/user-attachments/assets/bda6ad97-6a06-4d4c-b7ac-7425e5339386) | [<img src="https://github.com/user-attachments/assets/1ef90fd3-2f0e-401d-bce4-1aaf921ca2d6" alt="Assistant view" width="260">](https://github.com/user-attachments/assets/1ef90fd3-2f0e-401d-bce4-1aaf921ca2d6) |
+[<img src="https://github.com/user-attachments/assets/6c948d96-8328-4fec-a377-25bb1b37ca28" alt="New home hero" width="260">](https://github.com/user-attachments/assets/6c948d96-8328-4fec-a377-25bb1b37ca28) | [<img src="https://github.com/user-attachments/assets/bda6ad97-6a06-4d4c-b7ac-7425e5339386" alt="Calendar view" width="260">](https://github.com/user-attachments/assets/bda6ad97-6a06-4d4c-b7ac-7425e5339386) | [<img src="https://github.com/user-attachments/assets/1ef90fd3-2f0e-401d-bce4-1aaf921ca2d6" alt="Assistant view" width="260">](https://github.com/user-attachments/assets/1ef90fd3-2f0e-401d-bce4-1aaf921ca2d6) |
 
-> Tip: Keep “Latest” to your 3–6 freshest shots so reviewers see the current UI first.
 
-<details>
-  <summary><strong>Older screenshots (expand)</strong></summary>
-
-  <!-- Repeat the 3-across table pattern as needed -->
-  
-  | | | |
-  |---|---|---|
-  | [<img src="https://github.com/user-attachments/assets/6c948d96-8328-4fec-a377-25bb1b37ca28" alt="Home older" width="260">](https://github.com/user-attachments/assets/6c948d96-8328-4fec-a377-25bb1b37ca28) | [<img src="https://github.com/user-attachments/assets/bda6ad97-6a06-4d4c-b7ac-7425e5339386" alt="Calendar older" width="260">](https://github.com/user-attachments/assets/bda6ad97-6a06-4d4c-b7ac-7425e5339386) | [<img src="https://github.com/user-attachments/assets/1ef90fd3-2f0e-401d-bce4-1aaf921ca2d6" alt="Assistant older" width="260">](https://github.com/user-attachments/assets/1ef90fd3-2f0e-401d-bce4-1aaf921ca2d6) |
-
-  <!-- Add more rows for additional images -->
-  
-</details>
 
 ---
 
