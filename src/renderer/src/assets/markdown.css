@@ -181,7 +181,7 @@
 
 /* Force icons/buttons in the toolbar to have the color #F2F1F1 */
 .react-markdown-editor-lite .button {
-  color: #F2F1F1 !important;
+  color: #1F292B !important;
 }
 
 .react-markdown-editor-lite .button:hover {
@@ -214,16 +214,31 @@
 
 /* Custom icon color override */
 .react-markdown-editor-lite .button {
-  color: #F2F1F1 !important;
+  color: #1F292B !important;
 }
 
 .react-markdown-editor-lite .button:hover {
   color: #ccc !important;
 }
 
+i.rmel-iconfont { /* top icon colors */
+  
+}
 
+div.rc-md-navigation.visible  {
+  background-color: #343D3F !important; /* Ensure text is readable */
+  border-radius: 10px 10px 0px 0px !important; /* Rounded corners */
+}
 
-
+textarea.section-container.input {
+  background-color: #343D3F !important; /* Ensure text is readable */
+  color: #F2F1F1 !important; /* White text for contrast */
+  border-radius: 0px 0px 10px 10px !important; /* Rounded corners */
+  border: none !important; /* Remove border */
+}
+section.section.sec-md.visible {
+  border: none !important; /* Remove border */
+}
 
 
 /* ICON FONT (BASE64 data omitted for clarity—keep as needed) */

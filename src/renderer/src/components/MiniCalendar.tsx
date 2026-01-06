@@ -7,6 +7,8 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useTasks } from '../context/TaskContext';
 import { getProjectColorForName } from '../utils/projectColors';
 import { loadProjectsFromLocalStorage } from '../utils/localStorageUtils';
+import { formatTaskDate } from '../utils/formatDate';
+import { useSettings } from '../context/SettingsContext';
 
 const localizer = momentLocalizer(moment);
 
@@ -30,6 +32,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ onSelectDate }) => {
   const [persistedEvents, setPersistedEvents] = useState(loadEventsFromLocalStorage());
   const projects = loadProjectsFromLocalStorage();
   const { tasks } = useTasks();
+  const { dateFormat } = useSettings();
 
   useEffect(() => {
     const updateEvents = () => {
@@ -97,7 +100,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ onSelectDate }) => {
                   <i className="pr-1 fas fa-project-diagram"></i> {event.project}
                 </span>
                 <span className="text-[.7rem] text-b-blue-400">
-                  <i className="pr-1 fas fa-calendar"></i> {moment(event.start).format('MMM D')}
+                  <i className="pr-1 fas fa-calendar"></i> {formatTaskDate(event.start, dateFormat)}
                 </span>
               </div>
               <span>{event.description}</span>
@@ -160,6 +163,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ onSelectDate }) => {
         defaultView="month"
         toolbar={false}
         selectable
+        onNavigate={() => {}}
         onSelectSlot={(slotInfo) => {
           // When a slot is selected, notify the parent.
           if (onSelectDate) onSelectDate(slotInfo.start);

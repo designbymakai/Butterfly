@@ -118,6 +118,42 @@ button.rbc-button-link.rbc-show-more:hover  {
 .rbc-day-bg + .rbc-day-bg:hover {
   background-color: #84C0C4;
 }
+.rbc-day-bg + .rbc-day-bg:hover .rbc-date-cell {
+  background-color: #84C0C4; /* Change background color on hover */
+  z-index: 99;
+}
+.mini-calendar-container .rbc-event,
+.mini-calendar-container .rbc-row-segment {
+  z-index: 1;
+  position: relative;
+}
+/* For both mini and large calendar containers */
+.rbc-month-view .rbc-date-cell {
+  position: relative;
+  z-index: 2;
+}
+.rbc-row-segment .rbc-row {
+  position: relative;
+  z-index: 1;
+}
+
+.rbc-month-view .rbc-date-cell:hover::before,
+.rbc-month-view .rbc-date-cell.rbc-off-range:hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: #84C0C4;
+  border-radius: 6px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.7;
+  transition: background 0.2s;
+}
+.rbc-month-view .rbc-event,
+.rbc-month-view .rbc-row-segment {
+  z-index: 5;
+  position: relative;
+}
 
 .rbc-month-view, 
 .rbc-agenda-view, 
@@ -286,4 +322,25 @@ button.rbc-button-link.rbc-show-more:hover  {
 .rbc-task-title {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* Highlight date cells on hover in MiniCalendar */
+.mini-calendar-container .rbc-month-view .rbc-date-cell {
+  transition: background 0.2s;
+}
+.mini-calendar-container .rbc-month-view .rbc-date-cell:hover {
+  background: rgba(52, 152, 219, 0.15); /* Light blue background on hover */
+  cursor: pointer;
+  border-radius: 6px;
+}
+/* Add this or update your existing hover rules: */
+.mini-calendar-container .rbc-month-view .rbc-date-cell,
+.mini-calendar-container .rbc-month-view .rbc-date-cell.rbc-off-range {
+  transition: background 0.2s;
+}
+
+.mini-calendar-container .rbc-month-view .rbc-date-cell:hover,
+.mini-calendar-container .rbc-month-view .rbc-date-cell.rbc-off-range:hover {
+  background: rgba(52, 152, 219, 0.15) !important;
+  cursor: pointer;
+  border-radius: 6px;
 }

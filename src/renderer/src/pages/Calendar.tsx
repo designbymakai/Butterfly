@@ -156,19 +156,23 @@ const Cal = () => {
   };
 
   const handleEventDrop = ({ event, start, end }) => {
-  if (event.isTask) {
-      // For tasks, update the dueDate (normalized to midnight)
+    if (event.isTask) {
+      // Find the original task by ID
+      const originalTask = tasks.find(t => t.id === event.id);
+      if (!originalTask) return;
+
       const newDate = new Date(start);
       newDate.setHours(0, 0, 0, 0);
-      // Build the updated task while preserving project, tags, and projectColor from the event.
+
+      // Merge all fields from the original task, but update the date
       const updatedTask = {
-        ...event,
+        ...originalTask,
         dueDate: newDate.toISOString(),
         start: newDate,
-        end: new Date(newDate.getTime() + 86400000), // one day later
-        project: event.project,   // preserve project
-        tags: event.tags,         // preserve tags
-        projectColor: event.projectColor // preserve the existing project color
+        end: new Date(newDate.getTime() + 86400000),
+        project: event.project,
+        tags: event.tags,
+        projectColor: event.projectColor,
       };
       console.log("Updating task via drag-drop:", updatedTask);
       updateTask(updatedTask);

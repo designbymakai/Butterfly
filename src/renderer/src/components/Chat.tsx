@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useImperativeHandle, forwardRef, useState, useRef, useEffect } from 'react';
 import { loadTodosFromLocalStorage, saveTodosToLocalStorage } from '../utils/localStorageUtils'
 import { loadEventsFromLocalStorage, saveEventsToLocalStorage } from '@renderer/pages/Calendar';
 import ReactMarkdown from 'react-markdown'
@@ -10,6 +10,9 @@ import { parseTaskCommand } from '@renderer/utils/parseTaskCommand'
 import { parseEventCommand } from '@renderer/utils/parseEventCommand'
 import SelectorModal from './modals/selectorModal'
 import { useTasks } from '../context/TaskContext';
+import SmartSuggestionCard from './SmartSuggestionCard';
+import MiniCompactTodoItem from './MiniCompactTodoItem'; // Add this import
+
 
 
 interface Message {
@@ -36,8 +39,8 @@ interface Event {
   end: string
 }
 
-const Chat: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([])
+const Chat = forwardRef((props, ref) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const { addTask } = useTasks();
   const [input, setInput] = useState('')
   const createTaskRef = useRef<(taskDetails: Task) => void>()
@@ -46,6 +49,7 @@ const Chat: React.FC = () => {
   const [showPicker, setShowPicker] = useState(false)
   const [pickerItems, setPickerItems] = useState<any[]>([]) // tasks or events
   const [pickerTitle, setPickerTitle] = useState('')
+
 
   const brandStylePrompt = `
     You are Butterfly, a supportive productivity assistant. Whenever a user gives a plain text command to create a task (for example, "Create a task: turn in library book on tuesday" or "I need to return my rental car on friday"), convert that command into a function call to "createTask" with a JSON object containing the required fields: title, dueDate, project (if any), and tags (if any)
@@ -79,6 +83,21 @@ const Chat: React.FC = () => {
     return newEvent;
   };
 
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const { tasks } = useTasks();
+  const allTasks = tasks;  const getTaskDueDate = (task: any) => {
+    const raw = task.dueDate || task.date;
+    return raw ? new Date(raw) : null;
+  };
+
+  const overdueTasks = allTasks.filter(
+    (task) =>
+      !task.completed &&
+      getTaskDueDate(task) &&
+      getTaskDueDate(task) < today
+  );
 // Example helper to convert a plain text event command to a createEvent call.
   function createEventFromPlainTextCommand(command) {
     // Regular expression to extract:
@@ -150,6 +169,8 @@ const Chat: React.FC = () => {
     // Call your local createEvent function
     createEvent(eventDetails);
   }
+
+  
 
   const handleSend = async (messageContent?: string) => {
     const content = messageContent || input
@@ -296,6 +317,39 @@ const Chat: React.FC = () => {
     // Pre-fill input with the modifier (capitalized) so the user sees an active state.
     setInput(mod.charAt(0).toUpperCase() + mod.slice(1) + ' ')
   }
+  const handleSmartSuggestionClick = (suggestion: string) => {
+    setMessages((prev) => [
+      ...prev,
+      { sender: 'user', content: suggestion }
+    ]);
+    if (suggestion.toLowerCase().includes('overdue')) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: 'bot',
+          content: overdueTasks.length
+            ? overdueTasks.map((task) => (
+                <MiniCompactTodoItem
+                  title={task.title}
+                  completed={task.completed}
+                  onToggle={() => {}}
+                  projectColor={task.projectColor}
+                  description={task.description}
+                  project={task.project}
+                  dueDate={task.dueDate || task.date}
+                  tags={task.tags}
+                />
+              ))
+            : 'No overdue tasks!'
+        }
+      ]);
+    } else {
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'bot', content: `You clicked: ${suggestion}` }
+      ]);
+    }
+  };
 
   const parseTaskDetails = (jsonString: string) => {
     try {
@@ -379,9 +433,13 @@ const Chat: React.FC = () => {
   const handleClearChat = () => {
     setMessages([])
   }
+  useImperativeHandle(ref, () => ({
+      handleSmartSuggestionClick,
+    }));
 
   return (
     <div className="flex flex-col justify-center m-auto p-5 overflow-hidden h-full">
+      
       {/* Message List */}
       <div className="flex-grow overflow-y-auto">
         <div className="flex flex-col">
@@ -478,6 +536,9 @@ const Chat: React.FC = () => {
       )}
     </div>
   )
-}
+});
 
-export default Chat
+Chat.displayName = "Chat";
+
+
+export default Chat;

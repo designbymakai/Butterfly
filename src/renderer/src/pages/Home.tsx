@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Chat from "../components/Chat";
 import MiniCalendar from "../components/MiniCalendar";
 import CompactTodoItem from '../components/CompactTodoItem';
@@ -49,7 +49,7 @@ const loadEventsFromLocalStorage = () => {
   return [];
 };
 
-function Home({ onNavigate }: HomeProps) {
+function Home({ onNavigate, onJumpToProject }: HomeProps & { onJumpToProject: (projectName: string) => void }) {
   const [timeOfDay] = useState(getTimeOfDay());
   const { tasks } = useTasks();
   const [selectedDay, setSelectedDay] = useState(new Date());
@@ -72,6 +72,16 @@ function Home({ onNavigate }: HomeProps) {
     });
   };
 
+  // Chat ref to call functions from the chat component
+  const chatRef = useRef<any>(null);
+
+   // Handler to send suggestion to chat
+  const handleSuggestionToChat = (suggestion: string) => {
+    if (chatRef.current && chatRef.current.handleSmartSuggestionClick) {
+      chatRef.current.handleSmartSuggestionClick(suggestion);
+    }
+  };
+
   const getEventsForSelectedDay = () => {
     const dayStart = new Date(selectedDay);
     dayStart.setHours(0,0,0,0);
@@ -90,26 +100,18 @@ function Home({ onNavigate }: HomeProps) {
   return (
     <div className="flex flex-col h-full w-full p-8 justify-between">
       <div className="flex flex-row h-2/6 w-full justify-between">
-        {/* Replace Welcome Card with Smart Suggestion Card */}
-        <div className="flex flex-col w-1/4 h-full mx-4">
-          <SmartSuggestionCard
-            tasks={todos}
-            events={events}
-            onSuggestionClick={(suggestion) => {
-              // When a suggestion is clicked,
-              // you can trigger the chat UI to expand on this suggestion.
-              // For example, pre-fill the chat input or push a follow-up message.
-              alert(`Suggestion triggered: ${suggestion}\nHey Makai, would you like me to help with that?`);
-            }}
-          />
-        </div>
+        {/* Smart Suggestion Card goes here, removed for now */}
+        
         {/* Dashboard Card */}
-        <div className="flex flex-col w-1/4 h-full mx-4">
+        <div className="flex flex-col w-1/2 h-full mx-4">
           <DashboardCard 
             todos={todos}
             tasks={tasks}
             onFocusSession={() => { alert("Focus Session triggered!"); }}
-            onJumpToProject={() => { alert("Jump to Recent Projects triggered!"); }}
+            onJumpToProject={(projectName) => {
+              onNavigate('Projects');
+              onJumpToProject(projectName);
+            }}
           />
         </div>
         {/* Agenda Card */}
@@ -158,7 +160,7 @@ function Home({ onNavigate }: HomeProps) {
       <div className="flex flex-row h-4/6 w-full pt-4 justify-between">
         <div className="flex w-3/5 h-full pr-10 rounded-lg m-auto">
           <div className="w-full h-full place-content-end">
-            <Chat />
+            <Chat ref={chatRef}/>
           </div>
         </div>
         <div className="flex flex-col w-2/5 h-full rounded-lg m-auto">

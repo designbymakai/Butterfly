@@ -3,7 +3,7 @@ import ProjectsTab from '../components/ProjectsTab';
 import { useTasks } from '../context/TaskContext';
 import { loadTodosFromLocalStorage, saveTodosToLocalStorage, loadProjectsFromLocalStorage, saveProjectsToLocalStorage } from '../utils/localStorageUtils';
 
-const Projects = () => {
+const Projects = ({ selectedProjectName }: { selectedProjectName?: string | null }) => {
   const { tasks, addTask, updateTask, deleteTask } = useTasks();
   const [todos, setTodos] = useState(loadTodosFromLocalStorage());
   const [projects, setProjects] = useState(loadProjectsFromLocalStorage());
@@ -27,6 +27,7 @@ const Projects = () => {
         handleUpdateTodo={() => {}}
         projects={projects}
         setProjects={setProjects}
+        selectedProjectName={selectedProjectName} // <-- pass it here!
       />
     </div>
   );

@@ -11,6 +11,11 @@ interface Task {
   tags: string[];
   icon: any;
   projectColor: string;
+  progress?: string;
+  priority?: string;
+  previousProgress?: string;
+  completedAt?: string;
+  deadline?: string | null; // <-- add this line
 }
 
 interface TaskContextProps {

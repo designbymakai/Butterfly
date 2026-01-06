@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { createRandomTodo } from '@renderer/utils/createRandomTodo';
 import { useTasks } from '../context/TaskContext'; // import hook to access tasks methods
+import { useSettings } from '../context/SettingsContext';
 
 function Settings() {
+  const { dateFormat, setDateFormat } = useSettings();
   const [userName, setUserName] = useState(localStorage.getItem('userName') || 'Makai');
   const [chatGPTKey, setChatGPTKey] = useState(localStorage.getItem('chatGPTKey') || '');
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
@@ -18,6 +20,12 @@ function Settings() {
   const handleChatGPTKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChatGPTKey(e.target.value);
     localStorage.setItem('chatGPTKey', e.target.value);
+  };
+
+
+  const handleDateFormatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDateFormat(e.target.value);
+    localStorage.setItem('dateFormat', e.target.value);
   };
 
   const activeProjects = ["Marketing", "Development", "Sales"];
@@ -66,6 +74,18 @@ function Settings() {
           className="p-2 border rounded-md w-full"
         />
       </div>
+      <div>
+  <label htmlFor="dateFormat" className="text-b-black-600 mb-2">Date Format:</label>
+  <select
+    id="dateFormat"
+    value={dateFormat}
+    onChange={handleDateFormatChange}
+    className="p-2 border rounded-md w-full"
+  >
+    <option value="US">US (MM/DD)</option>
+    <option value="EU">EU (DD/MM)</option>
+  </select>
+</div>
       <div>
         <label htmlFor="chatGPTKey" className="text-b-black-600 mb-2">ChatGPT API Key:</label>
         <input 

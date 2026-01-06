@@ -1,10 +1,10 @@
 {
-  "name": "buttefly",
+  "name": "butterfly",
   "version": "1.0.0",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Makai Ingalls",
+  "homepage": "https://designbymakai.com",
   "type": "module",
   "scripts": {
     "format": "prettier --write .",
@@ -69,7 +69,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
-    "electron": "^31.0.2",
+    "electron": "^38.1.2",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
     "eslint": "^8.57.0",

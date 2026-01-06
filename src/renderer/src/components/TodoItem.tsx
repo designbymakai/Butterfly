@@ -29,6 +29,10 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
+import { formatTaskDate } from '../utils/formatDate';
+import { useSettings } from '../context/SettingsContext';
 
 const getPastelColorForTag = (tag: string): string => {
   let hash = 0;
@@ -94,6 +98,8 @@ const TodoItem: React.FC<TodoItemProps> = ({
   } = initialTodo;
   
   // Local state for editing the todo object.
+    const { dateFormat } = useSettings();
+
   const [editTodo, setEditTodo] = useState(initialTodo);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
@@ -103,12 +109,46 @@ const TodoItem: React.FC<TodoItemProps> = ({
   const [newTag, setNewTag] = useState('');
   const [editingTagIndex, setEditingTagIndex] = useState<number | null>(null);
   const [editingTagValue, setEditingTagValue] = useState('');
+  const [isEditingDeadline, setIsEditingDeadline] = useState(false);
+  const deadlineRef = useRef<DatePicker | null>(null);
 
   const titleRef = useRef<HTMLInputElement | null>(null);
   const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
   const projectRef = useRef<HTMLSelectElement | null>(null);
   const dueDateRef = useRef<DatePicker | null>(null);
   const tagsRef = useRef<HTMLInputElement | null>(null);
+
+  
+  useEffect(() => {
+    setEditTodo(todo);
+  }, [todo]);
+
+  const handleToggle = () => {
+    if (!editTodo.completed) {
+      // Mark as completed, save previous progress and set completedAt
+      const updatedTodo = {
+        ...editTodo,
+        completed: true,
+        previousProgress: editTodo.progress,
+        progress: "Completed",
+        completedAt: new Date().toISOString(), // <-- set completion date
+      };
+      setEditTodo(updatedTodo);
+      onUpdate(updatedTodo);
+      onSave(updatedTodo);
+    } else {
+      // Unmark as completed, restore previous progress (keep completedAt for history)
+      const updatedTodo = {
+        ...editTodo,
+        completed: false,
+        progress: editTodo.previousProgress || "Not Started",
+        // Optionally: completedAt: undefined,
+      };
+      setEditTodo(updatedTodo);
+      onUpdate(updatedTodo);
+      onSave(updatedTodo);
+    }
+  };
 
   // Existing handlers for title, description, project, date, and tags...
   const handleTitleDoubleClick = () => setIsEditingTitle(true);
@@ -124,6 +164,22 @@ const TodoItem: React.FC<TodoItemProps> = ({
   };
   const handleTitleBlur = () => {
     setIsEditingTitle(false);
+    onUpdate(editTodo);
+    onSave(editTodo);
+  };
+
+  const handleDeadlineIconClick = () => {
+    if (editTodo.deadline) setIsEditingDeadline(true);
+  };
+  const handleDeadlineChange = (date: Date | null) => {
+    const updatedTodo = { ...editTodo, deadline: date ? date.toISOString() : null };
+    setEditTodo(updatedTodo);
+    onUpdate(updatedTodo);
+    onSave(updatedTodo);
+    setIsEditingDeadline(false);
+  };
+  const handleDeadlineBlur = () => {
+    setIsEditingDeadline(false);
     onUpdate(editTodo);
     onSave(editTodo);
   };
@@ -233,7 +289,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
     onSave(updatedTodo);
   };
 
-  const progressOptions = ["Not Started", "In Progress", "Waiting", "Needs Review", "Completed"];
+  const progressOptions = ["Not Started", "In Progress", "Waiting", "Needs Review"];
   const priorityOptions = ["Low", "Medium", "High"];
 
   const getProgressIcon = (progress: string) => {
@@ -267,6 +323,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   const handleProgressCycle = () => {
+    if (editTodo.completed) return; // Don't cycle if completed
     const currentIndex = progressOptions.indexOf(editTodo.progress);
     const nextIndex = (currentIndex + 1) % progressOptions.length;
     const newProgress = progressOptions[nextIndex];
@@ -298,7 +355,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
         <input
           type="checkbox"
           checked={completed}
-          onChange={onToggle}
+          onChange={handleToggle}
           className="ml-2 mr-4 h-4 w-4 appearance-none rounded-md border-2 border-b-blue-400 cursor-pointer bg-b-white-300 checked:bg-b-blue-100"
         />
       )}
@@ -329,77 +386,114 @@ const TodoItem: React.FC<TodoItemProps> = ({
               </span>
             )}
 
-            {/* Clickable progress icon with plain text */}
-            <span onClick={handleProgressCycle} className="ml-2 cursor-pointer flex items-center">
-              <FontAwesomeIcon
-                icon={getProgressIcon(editTodo.progress)}
-                className="text-b-black-500"
-              />
-              <span className="ml-1 text-sm text-b-black-600">{editTodo.progress}</span>
-            </span>
-
-            {/* Clickable priority icon with plain text */}
-            <span onClick={handlePriorityCycle} className="ml-2 cursor-pointer flex items-center">
-              <FontAwesomeIcon
-                icon={getPriorityIcon(editTodo.priority)}
-                className="text-b-black-500"
-              />
-              <span className="ml-1 text-sm text-b-black-600">{editTodo.priority}</span>
-            </span>
-
-            {/* Existing inline items for date and project remain here */}
-            <div className="flex items-center px-1">
-              <FontAwesomeIcon
-                icon={faCalendarAlt}
-                className="text-b-black-500 text-sm cursor-pointer pr-1"
-                onClick={handleDateIconClick}
-              />
-              {isEditingDueDate ? (
-                <DatePicker
-                  ref={dueDateRef}
-                  selected={dueDate ? new Date(dueDate) : null}
-                  onChange={handleDateChange}
-                  onBlur={handleDateBlur}
-                  customInput={<CustomInput />}
-                  className="text-sm text-b-black-500 bg-transparent"
-                  autoFocus
+            {/* Progress Icon */}
+            <Tippy content="Progress" delay={[500, 0]}>
+              <span onClick={handleProgressCycle} className="ml-2 cursor-pointer flex items-center">
+                <FontAwesomeIcon
+                  icon={getProgressIcon(editTodo.progress)}
+                  className="text-b-white-500"
                 />
-              ) : (
-                <span className="text-sm text-b-black-600 inline-block">
-                  {dueDate
-                    ? new Date(dueDate).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' })
-                    : 'Set Date'}
+                <span className="ml-1 text-sm text-b-white-500">{editTodo.progress}</span>
+              </span>
+            </Tippy>
+
+            {/* Priority Icon */}
+            <Tippy content="Priority" delay={[500, 0]}>
+              <span onClick={handlePriorityCycle} className="ml-2 cursor-pointer flex items-center">
+                <FontAwesomeIcon
+                  icon={getPriorityIcon(editTodo.priority)}
+                  className="text-b-white-500"
+                />
+                <span className="ml-1 text-sm text-b-white-500">{editTodo.priority}</span>
+              </span>
+            </Tippy>
+
+            {/* Due Date Icon */}
+            <Tippy content="Due Date" delay={[500, 0]}>
+              <div className="flex items-center px-1">
+                <FontAwesomeIcon
+                  icon={faCalendarAlt}
+                  className="text-b-white-500 text-sm cursor-pointer pr-1"
+                  onClick={handleDateIconClick}
+                />
+                {isEditingDueDate ? (
+                  <DatePicker
+                    ref={dueDateRef}
+                    selected={dueDate ? new Date(dueDate) : null}
+                    onChange={handleDateChange}
+                    onBlur={handleDateBlur}
+                    customInput={<CustomInput />}
+                    className="text-sm text-b-white-500 bg-transparent"
+                    autoFocus
+                  />
+                ) : (
+                  <span className="text-sm text-b-white-500 inline-block">
+                    {formatTaskDate(dueDate, dateFormat) || 'Set Date'}
+                  </span>
+                )}
+              </div>
+            </Tippy>
+
+            {/* Project Icon */}
+            <Tippy content="Project" delay={[500, 0]}>
+              <div className="flex items-center px-1">
+                <FontAwesomeIcon
+                  icon={faProjectDiagram}
+                  className="text-b-white-500 text-sm cursor-pointer pr-1"
+                  onClick={handleProjectIconClick}
+                />
+                {isEditingProject ? (
+                  <select
+                    ref={projectRef}
+                    value={editTodo.project}
+                    onChange={handleProjectChange}
+                    onBlur={handleProjectBlur}
+                    className="text-sm text-b-white-500 bg-transparent"
+                    autoFocus
+                  >
+                    <option value="Unassigned">Unassigned</option>
+                    {projects.map((proj: any, index: number) => (
+                      <option key={index} value={proj.name}>
+                        {proj.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <span className="text-sm text-b-white-500 inline-block">
+                    {project}
+                  </span>
+                )}
+              </div>
+            </Tippy>
+            
+            {/* Deadline Icon */}
+            {editTodo.deadline && (
+              <Tippy content="Deadline" delay={[500, 0]}>
+                <span className="ml-2 text-b-orange-300 text-sm font-bold flex items-center">
+                  <FontAwesomeIcon
+                    icon={faFlagCheckered}
+                    className="mr-1 cursor-pointer"
+                    onClick={handleDeadlineIconClick}
+                  />
+                  {isEditingDeadline ? (
+                    <DatePicker
+                      ref={deadlineRef}
+                      selected={editTodo.deadline ? new Date(editTodo.deadline) : null}
+                      onChange={handleDeadlineChange}
+                      onBlur={handleDeadlineBlur}
+                      customInput={<CustomInput />}
+                      className="text-sm text-b-orange-400 bg-transparent"
+                      autoFocus
+                    />
+                  ) : (
+                    <span>
+                      {formatTaskDate(editTodo.deadline, dateFormat)}
+                    </span>
+                  )}
                 </span>
-              )}
-            </div>
-            <div className="flex items-center px-1">
-              <FontAwesomeIcon
-                icon={faProjectDiagram}
-                className="text-b-black-500 text-sm cursor-pointer pr-1"
-                onClick={handleProjectIconClick}
-              />
-              {isEditingProject ? (
-                <select
-                  ref={projectRef}
-                  value={editTodo.project}
-                  onChange={handleProjectChange}
-                  onBlur={handleProjectBlur}
-                  className="text-sm text-b-black-600 bg-transparent"
-                  autoFocus
-                >
-                  <option value="Unassigned">Unassigned</option>
-                  {projects.map((proj: any, index: number) => (
-                    <option key={index} value={proj.name}>
-                      {proj.name}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <span className="text-sm text-b-black-600 inline-block">
-                  {project}
-                </span>
-              )}
-            </div>
+              </Tippy>
+            )}
+
           </div>
           <div className="flex items-center">
             {(editTodo.tags || []).map((tag: string, index: number) =>
@@ -411,13 +505,13 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   onChange={handleTagEditChange}
                   onKeyPress={handleTagEditKeyPress}
                   onBlur={handleTagEditBlur}
-                  className="text-sm text-b-black-600 bg-transparent"
+                  className="text-sm text-b-white-500 bg-transparent"
                   autoFocus
                 />
               ) : (
                 <span
                   key={index}
-                  className="text-sm mr-2 rounded-xl px-1.5 cursor-pointer inline-block text-b-white-600"
+                  className="text-sm mr-2 rounded-xl px-1.5 cursor-pointer inline-block text-b-white-500"
                   onClick={() => handleTagEdit(index)}
                 >
                   #{tag}
@@ -432,7 +526,8 @@ const TodoItem: React.FC<TodoItemProps> = ({
                 value={newTag}
                 onChange={handleTagChange}
                 onKeyPress={handleTagKeyPress}
-                className="text-sm text-b-black-600 bg-transparent"
+                onBlur={() => setIsEditingTags(false)} // <-- Add this line
+                className="text-sm text-b-blue-300 bg-transparent"
                 autoFocus
               />
             ) : (
@@ -454,13 +549,13 @@ const TodoItem: React.FC<TodoItemProps> = ({
             onChange={handleDescriptionChange}
             onKeyPress={handleDescriptionKeyPress}
             onBlur={handleDescriptionBlur}
-            className="text-sm text-b-black-600 bg-transparent"
+            className="text-sm text-b-black-500 bg-transparent"
             style={{ height: 'fit' }}
             autoFocus
           />
         ) : (
           <span
-            className="text-sm text-b-white-400 inline-block"
+            className="text-sm text-b-white-500 inline-block"
             onDoubleClick={handleDescriptionDoubleClick}
             style={{ height: 'fit' }}
           >

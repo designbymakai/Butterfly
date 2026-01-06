@@ -8,10 +8,13 @@ import { getProjectColorByIndex, getProjectColorForName } from '../utils/project
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical, faShapes } from '@fortawesome/free-solid-svg-icons';
 import ColorPickerModal from './ColorPickerModal';
-import CompactTodoItem from './CompactTodoItem';
+import MiniCompactTodoItem from './MiniCompactTodoItem';
 import '../assets/markdown.css';
 import 'react-markdown-editor-lite/lib/index.css';
 import { useTasks } from '../context/TaskContext';
+import CompactTodoItem from './CompactTodoItem';
+import { logProjectVisit } from '../utils/projectVisits'; // adjust path as needed
+
 
 const mdParser = new MarkdownIt({ html: true, linkify: true, typographer: true });
 
@@ -40,17 +43,21 @@ interface ProjectsTabProps {
   handleUpdateTodo: (updatedTodo: Todo, index: number) => void;
   projects: Project[];
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
+  selectedProjectName?: string | null;
 }
 
 const ProjectsTab: React.FC<ProjectsTabProps> = ({
+  selectedProjectName,
   todos,
+  setTodos,
+  editMode,
   handleToggleTodo,
   handleUpdateTodo,
   projects,
   setProjects,
 }) => {
-  const { tasks } = useTasks();
   const [selectedProject, setSelectedProject] = useState<'all' | string>('all');
+  const { tasks } = useTasks();
   const [projectNotes, setProjectNotes] = useState<Record<string, string>>({});
   const [isEditingProjects, setIsEditingProjects] = useState(false);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
@@ -79,26 +86,32 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
   }, []);
 
   useEffect(() => {
+    if (selectedProjectName) {
+      setSelectedProject(selectedProjectName);
+    }
+  }, [selectedProjectName]);
+
+  useEffect(() => {
     if (selectedProject !== 'all') {
       localStorage.setItem('projectNotes', JSON.stringify(projectNotes));
     }
   }, [projectNotes, selectedProject]);
-
-  const handleProjectSelect = (project: Project | 'all') => {
-    if (project === 'all') {
-      setSelectedProject('all');
-    } else {
-      setSelectedProject(project.name);
-    }
-    setIsEditingNotes(false);
-    setOpenProjectOptions(null);
-  };
 
   const handleSave = () => {
     localStorage.setItem('projectNotes', JSON.stringify(projectNotes));
     setIsEditingNotes(false);
   };
 
+  const handleProjectSelect = (project: Project | 'all') => {
+    if (project !== 'all') {
+      logProjectVisit(project.name);
+      setSelectedProject(project.name);
+    } else {
+      setSelectedProject('all');
+    }
+    setIsEditingNotes(false);
+    setOpenProjectOptions(null);
+  };
   // Dropdown handlers:
   const handleRenameProject = (index: number) => {
     setEditingTitleIndex(index);
@@ -241,7 +254,7 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
                             openProjectOptions === index ? null : index
                           );
                         }}
-                        className="absolute right-4 text-white text-2xl"
+                        className="absolute right-4 text-white text-2xl pl-4 pr-2"
                       >
                         <FontAwesomeIcon icon={faEllipsisVertical} />
                       </button>
@@ -306,22 +319,16 @@ const ProjectsTab: React.FC<ProjectsTabProps> = ({
                       {projectTasks.length > 0 && (
                         <div className="space-y-2">
                           {projectTasks.map((task) => (
-                            <CompactTodoItem
-                              key={task.id}
-                              title={task.title}
-                              description={task.description}
-                              project={project.name}
-                              dueDate={
-                                task.date ? new Date(task.date).toString() : ""
-                              }
-                              tags={task.tags}
-                              completed={task.completed}
-                              onToggle={() => {}}
-                              onSave={() => {}}
-                              selectedIcon={undefined}
-                              projectColor={color}
-                              onNavigate={() => handleProjectSelect(project)}
-                            />
+                           <MiniCompactTodoItem
+                            title={task.title}
+                            completed={task.completed}
+                            onToggle={() => {}}
+                            projectColor={task.projectColor}
+                            description={task.description}
+                            project={task.project}
+                            dueDate={task.dueDate || task.date}
+                            tags={task.tags}
+                          />
                           ))}
                         </div>
                       )}
